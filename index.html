@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCP Hackathon 2026 — Model Context Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0c10;--bg2:#13141a;--bg3:#1c1d26;--bg4:#22232f;
+  --border:#2a2b36;--border2:#3a3b4a;
+  --teal:#00d4aa;--teal2:#009e82;--tdim:rgba(0,212,170,.1);--tglow:rgba(0,212,170,.18);
+  --amber:#f5a623;--coral:#ff6b6b;--blue:#4a9eff;--purple:#a78bfa;
+  --success:#22c55e;--danger:#ef4444;
+  --text:#f0f0f5;--text2:#9a9ab0;--text3:#55556a;
+  --r:12px;--rl:18px;
+  --grad:linear-gradient(135deg,var(--teal),var(--blue));
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--border2)}
+
+/* NAV */
+#topnav{position:fixed;top:0;left:0;right:0;z-index:300;background:rgba(11,12,16,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:13px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.04em}
+.nav-links{display:flex;gap:2px;flex-wrap:wrap}
+.nlink{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--text2);padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.nlink:hover,.nlink.on{color:var(--teal);background:var(--tdim)}
+.nlink.admin-btn{color:var(--coral)}
+.nlink.admin-btn:hover,.nlink.admin-btn.on{color:var(--coral);background:rgba(255,107,107,.1)}
+.nav-right{font-size:11px;color:var(--text3);white-space:nowrap}
+
+/* SECTIONS */
+.page{display:none;min-height:100vh;padding:68px 0 60px;animation:fadeIn .3s ease}
+.page.on{display:block}
+.wrap{max-width:840px;margin:0 auto;padding:0 1.4rem}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* BUTTONS */
+.btn-p{background:linear-gradient(135deg,var(--teal),var(--teal2));color:#0b0c10;border:none;border-radius:var(--r);padding:11px 24px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(0,212,170,.25)}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,212,170,.35)}
+.btn-g{background:transparent;color:var(--text);border:1px solid var(--border2);border-radius:var(--r);padding:10px 20px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+.btn-g:hover{border-color:var(--teal);color:var(--teal)}
+.btn-sm{background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:7px 15px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+.btn-sm:hover{border-color:var(--teal);color:var(--teal)}
+.btn-smp{background:linear-gradient(135deg,var(--teal),var(--teal2));color:#0b0c10;border:none;border-radius:8px;padding:7px 15px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+.btn-smp:hover{opacity:.9;transform:translateY(-1px)}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:7px 15px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+.btn-danger:hover{background:rgba(239,68,68,.1)}
+
+/* CARD */
+.card-glow{box-shadow:0 0 0 1px rgba(0,212,170,.12),0 8px 32px rgba(0,0,0,.4)}
+
+/* HERO */
+#p-hero{padding:0;position:relative;overflow:hidden}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.22}
+.hero-glow{position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 30%,rgba(0,212,170,.07),transparent 70%)}
+.hero-svg{position:absolute;inset:0;pointer-events:none}
+.hero-body{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem 1.5rem}
+.pill{display:inline-flex;align-items:center;gap:7px;background:var(--tdim);border:1px solid rgba(0,212,170,.28);border-radius:20px;padding:5px 14px;font-size:11px;color:var(--teal);font-weight:500;letter-spacing:.07em;margin-bottom:1.5rem}
+.pdot{width:5px;height:5px;border-radius:50%;background:var(--teal);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+h1.hh{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,5.5vw,3.6rem);line-height:1.1;margin-bottom:1rem}
+.hac{color:var(--teal)}
+.hsub{font-size:.97rem;color:var(--text2);max-width:480px;line-height:1.75;margin-bottom:2.25rem;font-weight:300}
+.hbtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.scroll-cue{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text3);font-size:9px;letter-spacing:.1em}
+.scroll-line{width:1px;height:30px;background:linear-gradient(transparent,var(--teal))}
+
+/* Hero MCP illustration */
+.hero-illus{margin-bottom:2rem}
+
+/* ICEBREAKER */
+#p-ice .sec-label{font-size:10px;font-weight:600;color:var(--teal);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+#p-ice .sec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:clamp(1.4rem,2.8vw,1.9rem);line-height:1.25;margin-bottom:.5rem}
+#p-ice .sec-sub{font-size:.9rem;color:var(--text2);line-height:1.7;font-weight:300;max-width:560px}
+.scene-bar{display:flex;gap:6px;align-items:center;margin:1.75rem 0 1.5rem}
+.sbar-dot{flex:1;height:4px;border-radius:2px;background:var(--border2);transition:all .35s}
+.sbar-dot.done{background:var(--teal2)}.sbar-dot.now{background:var(--teal)}
+.sbar-lbl{font-size:11px;color:var(--text3);white-space:nowrap}
+.scene{display:none}.scene.on{display:block}
+.loc-badge{display:inline-flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--text2);margin-bottom:1.25rem}
+.loc-icon{font-size:1rem}.loc-name{font-weight:500;color:var(--text)}
+.aria-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem;margin-bottom:1.25rem}
+.aria-top{display:flex;align-items:center;gap:12px;margin-bottom:1rem}
+.aria-avatar{width:44px;height:44px;border-radius:50%;background:var(--bg3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;transition:border-color .4s}
+.aria-avatar.powered{border-color:var(--teal);box-shadow:0 0 12px var(--tglow)}
+.aria-name{font-weight:500;color:var(--text);font-size:.9rem;margin-bottom:2px}
+.aria-status{font-size:.75rem;color:var(--text3);display:flex;align-items:center;gap:5px}
+.aria-status .dot{width:5px;height:5px;border-radius:50%;background:var(--text3);flex-shrink:0}
+.aria-status.connected .dot{background:var(--teal);animation:blink 2s ease-in-out infinite}
+.aria-status.connected{color:var(--teal)}
+.bubble-wrap{display:grid;gap:10px;margin-bottom:1.25rem}
+.bubble{border-radius:var(--r);padding:1rem 1.1rem;font-size:.87rem;line-height:1.7;position:relative}
+.bubble-q{background:var(--bg4);border:1px solid var(--border);color:var(--text)}
+.bubble-q::before{content:'You asked';font-size:.72rem;font-weight:600;color:var(--text3);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em}
+.bubble-a{background:var(--bg3);border:1px solid var(--border2)}
+.bubble-a.blind{border-color:rgba(255,107,107,.2);background:rgba(255,107,107,.04)}
+.bubble-a.smart{border-color:rgba(0,212,170,.25);background:var(--tdim);display:none}
+.bubble-a::before{content:'Aria says';font-size:.72rem;font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em}
+.bubble-a.blind::before{color:#ff9a9a}.bubble-a.smart::before{color:var(--teal)}
+.bubble-a .guess-tag{display:inline-block;background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.2);border-radius:20px;padding:2px 10px;font-size:.72rem;color:#ff9a9a;margin-bottom:6px}
+.bubble-a .live-tag{display:inline-block;background:var(--tdim);border:1px solid rgba(0,212,170,.2);border-radius:20px;padding:2px 10px;font-size:.72rem;color:var(--teal);margin-bottom:6px}
+.connect-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem;margin-bottom:1.25rem}
+.connect-title{font-size:.8rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:1rem}
+.connect-plug{display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all .25s;margin-bottom:0}
+.connect-plug:hover{border-color:var(--teal);background:var(--tdim)}
+.connect-plug.plugged{border-color:rgba(0,212,170,.4);background:var(--tdim);cursor:default;pointer-events:none}
+.plug-icon{width:42px;height:42px;border-radius:10px;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;transition:all .3s}
+.connect-plug.plugged .plug-icon{background:var(--tdim);border-color:rgba(0,212,170,.3)}
+.plug-info{flex:1}.plug-name{font-weight:500;color:var(--text);font-size:.88rem;margin-bottom:2px}
+.plug-desc{font-size:.78rem;color:var(--text3);line-height:1.4}
+.plug-btn{flex-shrink:0;background:var(--teal);color:#0b0c10;border:none;border-radius:8px;padding:7px 14px;font-size:.78rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;white-space:nowrap}
+.plug-btn:hover{background:var(--teal2)}
+.plug-status{flex-shrink:0;font-size:.75rem;color:var(--teal);font-weight:500;display:none}
+.connect-plug.plugged .plug-btn{display:none}
+.connect-plug.plugged .plug-status{display:block}
+.insight{border-left:3px solid var(--teal);background:var(--tdim);border-radius:0 var(--r) var(--r) 0;padding:.9rem 1.1rem;margin:1rem 0;font-size:.86rem;color:var(--text2);line-height:1.7;display:none}
+.insight.show{display:block}
+.insight strong{color:var(--teal);font-weight:500}
+.insight .ih{font-size:.75rem;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;display:block}
+.aria-connections{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.conn-chip{display:inline-flex;align-items:center;gap:5px;background:var(--tdim);border:1px solid rgba(0,212,170,.25);border-radius:20px;padding:3px 10px;font-size:.73rem;color:var(--teal);animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.scene-nav{display:flex;align-items:center;gap:10px;justify-content:flex-end;margin-top:.75rem}
+.scene-hint{flex:1;font-size:.78rem;color:var(--text3)}
+
+/* SLIDES */
+#p-slides .sec-label{font-size:10px;font-weight:600;color:var(--teal);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.slide-strip{display:flex;gap:5px;overflow-x:auto;padding-bottom:5px;margin-bottom:2rem;scrollbar-width:none}
+.slide-strip::-webkit-scrollbar{display:none}
+.stab{flex-shrink:0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11px;color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.stab:hover{border-color:var(--border2);color:var(--text)}
+.stab.on{border-color:var(--teal);background:var(--tdim);color:var(--teal)}
+.slide{display:none}.slide.on{display:block}
+.sh{font-size:10px;font-weight:600;color:var(--teal);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.9rem}
+.stitle{font-family:'Syne',sans-serif;font-weight:700;font-size:clamp(1.5rem,3vw,2rem);line-height:1.2;margin-bottom:.7rem}
+.ssub{font-size:.92rem;color:var(--text2);line-height:1.75;font-weight:300;max-width:580px;margin-bottom:1.4rem}
+.slide-hero{text-align:center;padding:1.75rem 0}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:1.25rem 0}
+.stat-c{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:.9rem;text-align:center}
+.stat-n{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;color:var(--teal);display:block;margin-bottom:3px}
+.stat-l{font-size:.74rem;color:var(--text3)}
+.hl{border-left:3px solid var(--teal);background:var(--tdim);border-radius:0 var(--r) var(--r) 0;padding:.85rem 1.1rem;margin:.9rem 0;font-size:.86rem;color:var(--text2);line-height:1.7}
+.hl strong{color:var(--teal);font-weight:500}
+.feat-list{display:grid;gap:8px;margin:1.1rem 0}
+.feat{display:grid;grid-template-columns:30px 1fr;gap:11px;align-items:start;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.85rem}
+.fi{width:26px;height:26px;border-radius:7px;background:var(--tdim);border:1px solid rgba(0,212,170,.2);display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0}
+.fh{font-weight:500;color:var(--text);font-size:.86rem;margin-bottom:2px}
+.fb{font-size:.79rem;color:var(--text3);line-height:1.5}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:1.2rem 0}
+@media(max-width:560px){.two-col{grid-template-columns:1fr}}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem}
+.ba-wrap{display:grid;grid-template-columns:1fr 32px 1fr;gap:12px;align-items:start;margin:1.25rem 0}
+.ba{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem}
+.ba.af{border-color:rgba(0,212,170,.22);background:var(--tdim)}
+.ba-lbl{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.8rem}
+.ba-lbl.r{color:var(--coral)}.ba-lbl.g{color:var(--teal)}
+.ba-item{display:flex;align-items:flex-start;gap:7px;font-size:.81rem;color:var(--text2);margin-bottom:6px;line-height:1.4}
+.ba-item::before{content:'';width:4px;height:4px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.ba .ba-item::before{background:var(--coral)}.ba.af .ba-item::before{background:var(--teal)}
+.ba-arr{display:flex;align-items:center;justify-content:center;color:var(--text3);padding-top:2rem;font-size:.9rem}
+@media(max-width:520px){.ba-wrap{grid-template-columns:1fr}.ba-arr{display:none}}
+.code{background:#0d1117;border:1px solid var(--border);border-radius:var(--r);padding:1rem;font-family:'Courier New',monospace;font-size:.76rem;color:#a8d8a8;line-height:1.6;overflow-x:auto;margin:.8rem 0}
+.kw{color:#ff79c6}.str{color:#f1fa8c}.cm{color:#6272a4}
+.tl{position:relative;padding-left:1.6rem;margin:1.25rem 0}
+.tl::before{content:'';position:absolute;left:5px;top:5px;bottom:5px;width:1px;background:linear-gradient(to bottom,var(--teal),var(--border))}
+.tl-item{position:relative;margin-bottom:1.25rem}
+.tl-dot{position:absolute;left:-1.6rem;top:4px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:2px solid var(--teal)}
+.tl-d{font-size:.72rem;color:var(--teal);font-weight:600;margin-bottom:2px}
+.tl-t{font-weight:500;color:var(--text);font-size:.86rem;margin-bottom:2px}
+.tl-b{font-size:.79rem;color:var(--text3);line-height:1.5}
+.snav-row{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem}
+
+/* ARCH */
+.arch-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:1.75rem;margin:1.25rem 0}
+.arow{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.anode{display:flex;flex-direction:column;align-items:center;justify-content:center;width:120px;min-height:64px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:10px 8px;cursor:pointer;text-align:center;transition:all .22s}
+.anode:hover{border-color:var(--teal);transform:translateY(-2px)}
+.anode.on{border-color:var(--teal);background:var(--tdim);box-shadow:0 0 16px var(--tglow)}
+.anode .ni{font-size:1.2rem;margin-bottom:4px}
+.anode .nl{font-size:.7rem;font-weight:500;color:var(--text);line-height:1.25}
+.anode .nt{font-size:.64rem;color:var(--text3);margin-top:2px}
+.aconn{text-align:center;padding:5px 0}
+.aconn-line{width:1px;height:18px;background:linear-gradient(to bottom,var(--teal),var(--teal2));margin:0 auto 2px}
+.aconn-lbl{font-size:.66rem;color:var(--text3)}
+.node-det{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:1.1rem;margin-top:1.1rem;display:none}
+.nd-t{font-weight:600;color:var(--teal);font-size:.87rem;margin-bottom:.4rem}
+.nd-b{font-size:.83rem;color:var(--text2);line-height:1.7}
+.nd-b strong{color:var(--text);font-weight:500}
+
+/* POLL */
+.poll-q{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:1.1rem;line-height:1.4}
+.poll-opts{display:grid;gap:7px;margin-bottom:1.1rem}
+.popt{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:11px 14px;cursor:pointer;font-size:.85rem;color:var(--text2);transition:all .18s;text-align:left;font-family:'DM Sans',sans-serif}
+.popt:hover{border-color:var(--border2);color:var(--text)}
+.popt.v{border-color:var(--teal);background:var(--tdim);color:var(--teal);pointer-events:none}
+.poll-res{display:none}.poll-res.show{display:block}
+.pb-row{margin-bottom:8px}
+.pb-lbl{display:flex;justify-content:space-between;font-size:.79rem;margin-bottom:3px}
+.pb-lbl span:first-child{color:var(--text);font-weight:500}
+.pb-lbl span:last-child{color:var(--text3)}
+.pb-track{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.pb-fill{height:100%;border-radius:3px;background:var(--teal);transition:width 1s cubic-bezier(.4,0,.2,1)}
+.pb-fill.top{background:var(--amber)}
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:1.25rem 0}
+.rc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.9rem;text-decoration:none;display:block;transition:border-color .2s}
+.rc:hover{border-color:var(--teal)}
+.rc-i{font-size:1.15rem;margin-bottom:6px}.rc-t{font-weight:500;color:var(--text);font-size:.83rem;margin-bottom:2px}.rc-u{font-size:.72rem;color:var(--teal)}
+.qa-box{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rl);padding:1.75rem;text-align:center;margin:1.5rem 0}
+.qa-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:.5rem}
+.qa-sub{font-size:.86rem;color:var(--text2);line-height:1.7;margin-bottom:1.4rem}
+hr.div{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
+
+/* ══════════════════════════════════════
+   QUIZ SECTION
+══════════════════════════════════════ */
+.quiz-wrap{max-width:620px;margin:0 auto;padding:0 1.4rem}
+
+/* Registration */
+.quiz-reg{text-align:center;padding:2rem 0}
+.quiz-icon{margin-bottom:1.5rem;display:flex;justify-content:center}
+.quiz-reg-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.6rem,3vw,2.2rem);margin-bottom:.5rem}
+.quiz-reg-sub{font-size:.93rem;color:var(--text2);margin-bottom:.4rem;font-weight:300}
+.quiz-meta-pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:2rem}
+.qpill{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:.76rem;color:var(--text2)}
+.quiz-form{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:1.75rem;text-align:left;card-glow:true}
+.form-group{margin-bottom:1.1rem}
+.form-label{display:block;font-size:.8rem;font-weight:600;color:var(--text2);margin-bottom:.5rem;letter-spacing:.04em;text-transform:uppercase}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:11px 14px;font-size:.9rem;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:all .2s}
+.form-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--tdim)}
+.form-input::placeholder{color:var(--text3)}
+.form-error{font-size:.75rem;color:var(--coral);margin-top:4px;display:none}
+
+/* Quiz progress */
+.quiz-progress-bar{height:3px;background:var(--border);border-radius:2px;margin-bottom:1.5rem;overflow:hidden}
+.quiz-progress-fill{height:100%;background:var(--grad);border-radius:2px;transition:width .4s ease}
+.quiz-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem}
+.quiz-q-badge{display:inline-flex;align-items:center;gap:6px}
+.quiz-q-num{font-size:.72rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.1em}
+.quiz-cat-tag{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:.7rem;color:var(--text3)}
+.quiz-timer{font-size:.8rem;color:var(--text3);font-variant-numeric:tabular-nums;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:4px 10px}
+.quiz-q-text{font-family:'Syne',sans-serif;font-weight:700;font-size:clamp(1.1rem,2.5vw,1.4rem);line-height:1.35;margin-bottom:1.4rem;color:var(--text)}
+.quiz-options{display:grid;gap:9px;margin-bottom:1.5rem}
+.qopt{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:13px 16px;cursor:pointer;font-size:.88rem;color:var(--text2);transition:all .2s;text-align:left;font-family:'DM Sans',sans-serif;line-height:1.45;position:relative}
+.qopt:hover:not(.locked){border-color:var(--teal);color:var(--text);background:var(--tdim);transform:translateX(2px)}
+.qopt.selected{border-color:var(--teal);color:var(--teal);background:var(--tdim)}
+.qopt.correct{border-color:var(--success)!important;background:rgba(34,197,94,.08)!important;color:var(--success)!important}
+.qopt.wrong{border-color:var(--danger)!important;background:rgba(239,68,68,.07)!important;color:var(--danger)!important}
+.qopt.reveal-correct{border-color:var(--success)!important;background:rgba(34,197,94,.06)!important;color:var(--success)!important}
+.qopt.locked{cursor:default;pointer-events:none}
+.quiz-foot{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:var(--text3)}
+.quiz-q-counter{font-size:.78rem;color:var(--text3)}
+
+/* Results */
+.quiz-results{padding:1rem 0}
+.result-hero{text-align:center;padding:1.5rem 0 1rem}
+.score-ring-wrap{position:relative;width:140px;height:140px;margin:0 auto 1.25rem}
+.score-ring-wrap svg{transform:rotate(-90deg)}
+.score-ring-bg{fill:none;stroke:var(--border2);stroke-width:8}
+.score-ring-fg{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)}
+.score-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-num{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;line-height:1}
+.score-denom{font-size:.75rem;color:var(--text3);margin-top:2px}
+.result-badge{display:inline-block;padding:6px 18px;border-radius:20px;font-size:.85rem;font-weight:600;margin-bottom:.75rem}
+.result-badge.excellent{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--success)}
+.result-badge.great{background:rgba(0,212,170,.12);border:1px solid rgba(0,212,170,.25);color:var(--teal)}
+.result-badge.good{background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.25);color:var(--amber)}
+.result-badge.learn{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.2);color:var(--coral)}
+.result-time{font-size:.8rem;color:var(--text3);margin-bottom:1.5rem}
+
+/* Category breakdown */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin:1.25rem 0}
+.cat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.9rem;text-align:center}
+.cat-name{font-size:.72rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem}
+.cat-score{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;color:var(--teal);margin-bottom:.4rem}
+.cat-mini-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.cat-mini-fill{height:100%;border-radius:2px;transition:width .8s ease}
+
+/* Question review */
+.review-section{margin-top:1.5rem}
+.review-title{font-size:.8rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:.8rem}
+.review-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:8px;overflow:hidden}
+.review-item.r-correct{border-color:rgba(34,197,94,.2)}
+.review-item.r-wrong{border-color:rgba(239,68,68,.2)}
+.review-q-header{display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+.review-q-icon{flex-shrink:0;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;margin-top:1px}
+.r-correct .review-q-icon{background:rgba(34,197,94,.15);color:var(--success)}
+.r-wrong .review-q-icon{background:rgba(239,68,68,.12);color:var(--danger)}
+.review-q-text{font-size:.84rem;color:var(--text);font-weight:500;flex:1;line-height:1.4}
+.review-detail{padding-top:.75rem;margin-top:.75rem;border-top:1px solid var(--border);display:none}
+.review-detail.open{display:block}
+.review-ans-row{font-size:.79rem;margin-bottom:4px;line-height:1.4}
+.review-ans-row .label{color:var(--text3);margin-right:4px}
+.review-ans-row.your-ans{color:var(--text)}
+.review-ans-row.correct-ans{color:var(--success)}
+.review-exp{font-size:.78rem;color:var(--text3);line-height:1.6;margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border)}
+.result-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:1.75rem}
+
+/* ══════════════════════════════════════
+   ADMIN DASHBOARD
+══════════════════════════════════════ */
+.admin-header{display:flex;align-items:center;gap:12px;margin-bottom:1.75rem;flex-wrap:wrap}
+.admin-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.7rem}
+.admin-badge{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.3);color:var(--coral);border-radius:20px;padding:4px 12px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.75rem}
+.admin-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:1.1rem;text-align:center}
+.admin-stat-n{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--teal);display:block;margin-bottom:3px}
+.admin-stat-n.coral{color:var(--coral)}
+.admin-stat-n.amber{color:var(--amber)}
+.admin-stat-l{font-size:.74rem;color:var(--text3)}
+.admin-section{margin-bottom:1.75rem}
+.admin-section-title{font-size:.8rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.9rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
+
+/* Admin charts */
+.dist-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.dist-label{font-size:.78rem;color:var(--text2);width:50px;flex-shrink:0;text-align:right}
+.dist-track{flex:1;height:22px;background:var(--bg3);border-radius:6px;overflow:hidden}
+.dist-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:8px;font-size:.72rem;font-weight:600;transition:width .8s ease;min-width:2px}
+.dist-count{font-size:.76rem;color:var(--text3);width:30px;flex-shrink:0}
+.qperf-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.qperf-num{font-size:.72rem;color:var(--text3);width:24px;flex-shrink:0;text-align:center}
+.qperf-track{flex:1;height:16px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.qperf-fill{height:100%;border-radius:4px;transition:width .8s ease}
+.qperf-pct{font-size:.72rem;color:var(--text3);width:36px;flex-shrink:0;text-align:right}
+.qperf-flag{font-size:.7rem;color:var(--coral);margin-left:2px}
+
+/* Admin table */
+.admin-table-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border)}
+.admin-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.admin-table th{background:var(--bg3);padding:.7rem .9rem;text-align:left;font-size:.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);white-space:nowrap}
+.admin-table td{padding:.7rem .9rem;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top}
+.admin-table tr:last-child td{border-bottom:none}
+.admin-table tr:hover td{background:var(--bg3)}
+.score-chip{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.74rem;font-weight:600}
+.score-chip.pass{background:rgba(34,197,94,.12);color:var(--success);border:1px solid rgba(34,197,94,.2)}
+.score-chip.fail{background:rgba(255,107,107,.1);color:var(--coral);border:1px solid rgba(255,107,107,.2)}
+.answer-detail{display:none;padding:.5rem 0;grid-template-columns:repeat(5,1fr);gap:4px}
+.answer-detail.open{display:grid}
+.ans-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700}
+.ans-dot.ok{background:rgba(34,197,94,.15);color:var(--success)}
+.ans-dot.no{background:rgba(239,68,68,.1);color:var(--danger)}
+.expand-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.75rem;font-family:'DM Sans',sans-serif;padding:2px 6px;border-radius:4px;transition:all .2s}
+.expand-btn:hover{color:var(--teal);background:var(--tdim)}
+.admin-empty{text-align:center;padding:3rem 1rem;color:var(--text3)}
+.admin-empty-icon{font-size:3rem;margin-bottom:.75rem;display:block}
+.admin-actions{display:flex;gap:8px;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap}
+
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:1.2rem 1.5rem;text-align:center;font-size:.74rem;color:var(--text3)}
+footer span{color:var(--teal)}
+.footer-admin-link{color:var(--text3);cursor:pointer;opacity:.35;transition:opacity .2s;font-size:.7rem;margin-left:1rem}
+.footer-admin-link:hover{opacity:.7;color:var(--coral)}
+
+/* ADMIN LOGIN MODAL */
+#admin-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+#admin-modal-overlay.open{display:flex}
+#admin-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);padding:2rem 2.2rem;width:min(360px,90vw);box-shadow:0 24px 60px rgba(0,0,0,.7)}
+.admin-modal-title{font-family:'Syne',sans-serif;font-size:1.1rem;color:var(--coral);margin-bottom:.25rem}
+.admin-modal-sub{font-size:.78rem;color:var(--text3);margin-bottom:1.4rem}
+#admin-modal input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:9px 14px;color:var(--text);font-size:.9rem;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:.75rem;transition:border-color .2s}
+#admin-modal input:focus{border-color:var(--teal)}
+.admin-modal-error{font-size:.75rem;color:var(--coral);min-height:1.1rem;margin-bottom:.5rem}
+.admin-modal-btns{display:flex;gap:.75rem;justify-content:flex-end}
+#admin-modal-cancel{background:none;border:1px solid var(--border2);border-radius:8px;padding:8px 18px;color:var(--text2);font-size:.82rem;font-family:'DM Sans',sans-serif;cursor:pointer}
+#admin-modal-submit{background:var(--coral);border:none;border-radius:8px;padding:8px 18px;color:#fff;font-size:.82rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:opacity .2s}
+#admin-modal-submit:hover{opacity:.85}
+
+/* ══════════════════════════════════════
+   PROFESSIONAL VISUAL LAYER
+══════════════════════════════════════ */
+
+/* Gradient border card */
+.gcard{position:relative;background:var(--bg2);border-radius:var(--rl);padding:1.4rem}
+.gcard::before{content:'';position:absolute;inset:0;border-radius:var(--rl);padding:1px;background:linear-gradient(135deg,rgba(0,212,170,.3),rgba(74,158,255,.15),rgba(167,139,250,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+
+/* Section intro banner */
+.sec-banner{display:flex;align-items:flex-start;gap:1rem;background:linear-gradient(135deg,rgba(0,212,170,.05) 0%,rgba(74,158,255,.03) 100%);border:1px solid var(--border);border-top:2px solid var(--teal);border-radius:var(--rl);padding:1.4rem 1.5rem;margin-bottom:1.75rem}
+.sec-banner-icon{width:44px;height:44px;border-radius:10px;background:var(--tdim);border:1px solid rgba(0,212,170,.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.sec-banner-body{}
+.sec-banner-label{font-size:.68rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px}
+.sec-banner-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;color:var(--text);margin-bottom:3px;line-height:1.25}
+.sec-banner-sub{font-size:.82rem;color:var(--text2);font-weight:300;line-height:1.5}
+
+/* Hero 2-col layout */
+.hero-2col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;max-width:960px;width:100%;text-align:left}
+@media(max-width:720px){.hero-2col{grid-template-columns:1fr;text-align:center}}
+.hero-2col .hbtns{justify-content:flex-start}
+@media(max-width:720px){.hero-2col .hbtns{justify-content:center}}
+.hero-2col .hsub{max-width:100%}
+.hero-right{display:flex;align-items:center;justify-content:center}
+@media(max-width:720px){.hero-right{display:none}}
+
+/* Hero stats strip */
+.hero-stats{display:flex;gap:0;background:rgba(13,14,20,.7);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-top:2rem;backdrop-filter:blur(8px)}
+.hstat{flex:1;padding:.85rem 1rem;text-align:center;border-right:1px solid var(--border)}
+.hstat:last-child{border-right:none}
+.hstat-n{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--teal);display:block;line-height:1}
+.hstat-l{font-size:.68rem;color:var(--text3);margin-top:3px;display:block}
+
+/* Feature cards (numbered) */
+.feat.numbered .fi{background:var(--grad);border:none;color:#0b0c10;font-weight:800;font-size:.75rem}
+
+/* Slide visual header */
+.slide-vis-header{background:linear-gradient(135deg,rgba(0,212,170,.06),rgba(74,158,255,.04));border:1px solid var(--border);border-radius:var(--rl);padding:1.5rem;margin-bottom:1.4rem;display:flex;align-items:center;gap:1.25rem}
+.slide-vis-icon{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0}
+.slide-vis-icon.blue{background:rgba(74,158,255,.1);border:1px solid rgba(74,158,255,.2)}
+.slide-vis-icon.teal{background:var(--tdim);border:1px solid rgba(0,212,170,.2)}
+.slide-vis-icon.amber{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2)}
+.slide-vis-icon.coral{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2)}
+.slide-vis-icon.purple{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)}
+.slide-vis-text .stitle{margin-bottom:.3rem}
+.slide-vis-text .ssub{margin-bottom:0}
+
+/* Tag chips on slide hero */
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin:.75rem 0 1.25rem;justify-content:center}
+.tag{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:.73rem;color:var(--text2)}
+.tag.teal{background:var(--tdim);border-color:rgba(0,212,170,.25);color:var(--teal)}
+.tag.blue{background:rgba(74,158,255,.08);border-color:rgba(74,158,255,.2);color:var(--blue)}
+.tag.amber{background:rgba(245,166,35,.07);border-color:rgba(245,166,35,.2);color:var(--amber)}
+
+/* Timeline enhanced */
+.tl-item .tl-d{display:inline-block;background:var(--tdim);border:1px solid rgba(0,212,170,.2);border-radius:20px;padding:2px 9px;margin-bottom:5px}
+
+/* Architecture enhanced */
+.arch-box{background:linear-gradient(160deg,var(--bg2) 0%,rgba(28,29,38,.8) 100%);border:1px solid var(--border);border-radius:var(--rl);padding:2rem;margin:1.25rem 0;position:relative;overflow:hidden}
+.arch-box::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,170,.05),transparent 70%);pointer-events:none}
+
+/* Poll option enhanced */
+.popt{position:relative;padding-left:2.5rem}
+.popt::before{content:attr(data-letter);position:absolute;left:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:5px;background:var(--bg3);border:1px solid var(--border2);font-size:.68rem;font-weight:700;color:var(--text3);display:flex;align-items:center;justify-content:center;line-height:18px;text-align:center}
+.popt.v::before{background:var(--tdim);border-color:rgba(0,212,170,.3);color:var(--teal)}
+
+/* Quiz enhanced */
+#p-quiz{background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(0,212,170,.04),transparent 60%)}
+.quiz-form{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);padding:1.75rem;text-align:left;box-shadow:0 0 0 1px rgba(0,212,170,.08),0 20px 60px rgba(0,0,0,.5)}
+.qopt::before{content:attr(data-letter);position:absolute;left:14px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);font-size:.72rem;font-weight:700;color:var(--text3);display:flex;align-items:center;justify-content:center;text-align:center;line-height:22px}
+.qopt{padding-left:3rem}
+.qopt.selected::before,.qopt.correct::before{background:rgba(0,212,170,.15);border-color:rgba(0,212,170,.3);color:var(--teal)}
+.qopt.wrong::before{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:var(--danger)}
+
+/* Result score color */
+.score-ring-wrap{filter:drop-shadow(0 0 20px rgba(0,212,170,.15))}
+
+/* Responsive nav */
+@media(max-width:600px){.nav-links{gap:1px}.nlink{padding:5px 7px;font-size:10px}}
+@media(max-width:480px){.nav-right{display:none}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="topnav">
+  <div class="nav-logo">MCP Hackathon 2026</div>
+  <div class="nav-links" id="nav-links">
+    <button class="nlink tab-home" onclick="showPage('p-hero')">Home</button>
+    <button class="nlink tab-ice" onclick="showPage('p-ice')">🛍️ Mall Story</button>
+    <button class="nlink tab-slides" onclick="showPage('p-slides')">Slides</button>
+    <button class="nlink tab-arch" onclick="showPage('p-arch')">Architecture</button>
+    <button class="nlink tab-wrap" onclick="showPage('p-wrap')">Poll</button>
+    <button class="nlink tab-quiz" onclick="showPage('p-quiz')">📝 Quiz</button>
+    <button class="nlink admin-btn tab-admin" onclick="showPage('p-admin')" style="display:none">🔐 Admin</button>
+  </div>
+  <div class="nav-right" id="nav-hint">Use ← → on slides</div>
+</nav>
+
+<!-- ======================================================
+     HERO
+====================================================== -->
+<section id="p-hero" class="page" style="padding:0">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <svg class="hero-svg" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice">
+    <circle cx="150" cy="150" r="4" fill="#00d4aa" opacity=".3"/>
+    <circle cx="480" cy="320" r="5" fill="#00d4aa" opacity=".5"/>
+    <circle cx="800" cy="180" r="4" fill="#00d4aa" opacity=".3"/>
+    <circle cx="960" cy="440" r="3" fill="#00d4aa" opacity=".25"/>
+    <circle cx="680" cy="540" r="4" fill="#00d4aa" opacity=".28"/>
+    <line x1="150" y1="150" x2="480" y2="320" stroke="#00d4aa" stroke-width=".6" opacity=".18" stroke-dasharray="5 5"><animate attributeName="stroke-dashoffset" from="0" to="20" dur="2s" repeatCount="indefinite"/></line>
+    <line x1="480" y1="320" x2="800" y2="180" stroke="#00d4aa" stroke-width=".6" opacity=".18" stroke-dasharray="5 5"><animate attributeName="stroke-dashoffset" from="0" to="-20" dur="2.5s" repeatCount="indefinite"/></line>
+    <line x1="800" y1="180" x2="960" y2="440" stroke="#00d4aa" stroke-width=".5" opacity=".13" stroke-dasharray="5 5"><animate attributeName="stroke-dashoffset" from="0" to="20" dur="3s" repeatCount="indefinite"/></line>
+    <line x1="480" y1="320" x2="680" y2="540" stroke="#00d4aa" stroke-width=".5" opacity=".13" stroke-dasharray="5 5"><animate attributeName="stroke-dashoffset" from="0" to="-20" dur="3.2s" repeatCount="indefinite"/></line>
+  </svg>
+  <div class="hero-body">
+    <div class="hero-2col">
+      <!-- LEFT: Text -->
+      <div>
+        <div class="pill"><div class="pdot"></div>KPIT WEBINAR 2026</div>
+        <h1 class="hh">Model<br>Context<br><span class="hac">Protocol</span></h1>
+        <p class="hsub">The open standard that gives AI live access to your data, tools, and systems — in 30 minutes or less.</p>
+        <div class="hbtns">
+          <button class="btn-p" onclick="showPage('p-ice')">🛍️ Start the Story →</button>
+          <button class="btn-g" onclick="showPage('p-quiz')">📝 Take the Quiz</button>
+        </div>
+        <div class="hero-stats">
+          <div class="hstat"><span class="hstat-n">Nov '24</span><span class="hstat-l">Launched by Anthropic</span></div>
+          <div class="hstat"><span class="hstat-n">Open</span><span class="hstat-l">Free & vendor-neutral</span></div>
+          <div class="hstat"><span class="hstat-n">Any AI</span><span class="hstat-l">Claude · GPT · Gemini</span></div>
+          <div class="hstat"><span class="hstat-n">5K+</span><span class="hstat-l">GitHub stars</span></div>
+        </div>
+      </div>
+      <!-- RIGHT: Large MCP diagram -->
+      <div class="hero-right">
+        <svg width="340" height="340" viewBox="0 0 340 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Outer glow ring -->
+          <circle cx="170" cy="170" r="155" stroke="rgba(0,212,170,.06)" stroke-width="1"/>
+          <circle cx="170" cy="170" r="120" stroke="rgba(0,212,170,.05)" stroke-width="1" stroke-dasharray="4 8"/>
+          <!-- Center AI Hub -->
+          <circle cx="170" cy="170" r="48" fill="rgba(0,212,170,.06)" stroke="rgba(0,212,170,.2)" stroke-width="1"/>
+          <circle cx="170" cy="170" r="36" fill="rgba(0,212,170,.1)" stroke="rgba(0,212,170,.35)" stroke-width="1.5"/>
+          <circle cx="170" cy="170" r="24" fill="rgba(0,212,170,.18)" stroke="#00d4aa" stroke-width="1.5"/>
+          <text x="170" y="165" text-anchor="middle" fill="#00d4aa" font-family="Syne,sans-serif" font-weight="800" font-size="10" letter-spacing="1">MCP</text>
+          <text x="170" y="180" text-anchor="middle" fill="rgba(0,212,170,.7)" font-family="DM Sans,sans-serif" font-size="7.5">HOST</text>
+          <!-- DB Server node (top-left) -->
+          <circle cx="60" cy="80" r="30" fill="rgba(74,158,255,.06)" stroke="rgba(74,158,255,.3)" stroke-width="1"/>
+          <circle cx="60" cy="80" r="22" fill="rgba(74,158,255,.1)" stroke="rgba(74,158,255,.4)" stroke-width="1"/>
+          <text x="60" y="76" text-anchor="middle" font-size="14">🗄️</text>
+          <text x="60" y="92" text-anchor="middle" fill="rgba(74,158,255,.9)" font-family="DM Sans,sans-serif" font-size="7" font-weight="600">DATABASE</text>
+          <!-- Calendar node (top-right) -->
+          <circle cx="280" cy="80" r="30" fill="rgba(245,166,35,.06)" stroke="rgba(245,166,35,.3)" stroke-width="1"/>
+          <circle cx="280" cy="80" r="22" fill="rgba(245,166,35,.1)" stroke="rgba(245,166,35,.4)" stroke-width="1"/>
+          <text x="280" y="76" text-anchor="middle" font-size="14">📅</text>
+          <text x="280" y="92" text-anchor="middle" fill="rgba(245,166,35,.9)" font-family="DM Sans,sans-serif" font-size="7" font-weight="600">CALENDAR</text>
+          <!-- Files node (bottom-left) -->
+          <circle cx="60" cy="260" r="30" fill="rgba(167,139,250,.06)" stroke="rgba(167,139,250,.3)" stroke-width="1"/>
+          <circle cx="60" cy="260" r="22" fill="rgba(167,139,250,.1)" stroke="rgba(167,139,250,.4)" stroke-width="1"/>
+          <text x="60" y="256" text-anchor="middle" font-size="14">📁</text>
+          <text x="60" y="272" text-anchor="middle" fill="rgba(167,139,250,.9)" font-family="DM Sans,sans-serif" font-size="7" font-weight="600">FILES</text>
+          <!-- API node (bottom-right) -->
+          <circle cx="280" cy="260" r="30" fill="rgba(255,107,107,.06)" stroke="rgba(255,107,107,.3)" stroke-width="1"/>
+          <circle cx="280" cy="260" r="22" fill="rgba(255,107,107,.1)" stroke="rgba(255,107,107,.4)" stroke-width="1"/>
+          <text x="280" y="256" text-anchor="middle" font-size="14">🌐</text>
+          <text x="280" y="272" text-anchor="middle" fill="rgba(255,107,107,.9)" font-family="DM Sans,sans-serif" font-size="7" font-weight="600">API</text>
+          <!-- Top node (User) -->
+          <circle cx="170" cy="30" r="20" fill="rgba(0,212,170,.06)" stroke="rgba(0,212,170,.25)" stroke-width="1"/>
+          <text x="170" y="35" text-anchor="middle" font-size="14">👤</text>
+          <!-- Connecting lines with animated data flow -->
+          <line x1="85" y1="93" x2="138" y2="143" stroke="rgba(74,158,255,.4)" stroke-width="1.2" stroke-dasharray="5 4">
+            <animate attributeName="stroke-dashoffset" from="0" to="18" dur="1.6s" repeatCount="indefinite"/>
+          </line>
+          <line x1="255" y1="93" x2="202" y2="143" stroke="rgba(245,166,35,.4)" stroke-width="1.2" stroke-dasharray="5 4">
+            <animate attributeName="stroke-dashoffset" from="0" to="-18" dur="2s" repeatCount="indefinite"/>
+          </line>
+          <line x1="85" y1="247" x2="138" y2="197" stroke="rgba(167,139,250,.4)" stroke-width="1.2" stroke-dasharray="5 4">
+            <animate attributeName="stroke-dashoffset" from="0" to="18" dur="2.3s" repeatCount="indefinite"/>
+          </line>
+          <line x1="255" y1="247" x2="202" y2="197" stroke="rgba(255,107,107,.4)" stroke-width="1.2" stroke-dasharray="5 4">
+            <animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.9s" repeatCount="indefinite"/>
+          </line>
+          <line x1="170" y1="50" x2="170" y2="122" stroke="rgba(0,212,170,.35)" stroke-width="1.2" stroke-dasharray="4 4">
+            <animate attributeName="stroke-dashoffset" from="0" to="16" dur="1.4s" repeatCount="indefinite"/>
+          </line>
+          <!-- Animated data packets -->
+          <circle r="3" fill="#00d4aa" opacity=".8">
+            <animateMotion dur="2.5s" repeatCount="indefinite" path="M85,93 L138,143"/>
+          </circle>
+          <circle r="3" fill="#f5a623" opacity=".8">
+            <animateMotion dur="2.8s" repeatCount="indefinite" path="M202,143 L255,93"/>
+          </circle>
+          <circle r="3" fill="#a78bfa" opacity=".8">
+            <animateMotion dur="3.1s" repeatCount="indefinite" path="M85,247 L138,197"/>
+          </circle>
+          <circle r="3" fill="#ff6b6b" opacity=".8">
+            <animateMotion dur="2.2s" repeatCount="indefinite" path="M202,197 L255,247"/>
+          </circle>
+          <!-- MCP label badges on lines -->
+          <rect x="92" y="110" width="30" height="12" rx="6" fill="rgba(0,0,0,.6)" stroke="rgba(0,212,170,.2)" stroke-width=".5"/>
+          <text x="107" y="119.5" text-anchor="middle" fill="rgba(0,212,170,.7)" font-size="6" font-family="DM Sans,sans-serif">MCP</text>
+          <rect x="196" y="110" width="30" height="12" rx="6" fill="rgba(0,0,0,.6)" stroke="rgba(245,166,35,.2)" stroke-width=".5"/>
+          <text x="211" y="119.5" text-anchor="middle" fill="rgba(245,166,35,.7)" font-size="6" font-family="DM Sans,sans-serif">MCP</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-cue"><span>SCROLL</span><div class="scroll-line"></div></div>
+</section>
+
+<!-- ======================================================
+     ICEBREAKER — MALL ADVENTURE
+====================================================== -->
+<section id="p-ice" class="page">
+<div class="wrap">
+  <div class="sec-banner">
+    <div class="sec-banner-icon">🛍️</div>
+    <div class="sec-banner-body">
+      <div class="sec-banner-label">Interactive Icebreaker</div>
+      <div class="sec-banner-title">Aria visits the mall</div>
+      <div class="sec-banner-sub">Aria is an AI assistant — brilliant, but blind to the real world. Connect her to live data sources one by one and watch her transform from guessing to knowing.</div>
+    </div>
+  </div>
+  <div class="scene-bar">
+    <div class="sbar-dot now" id="sb0"></div>
+    <div class="sbar-dot" id="sb1"></div>
+    <div class="sbar-dot" id="sb2"></div>
+    <div class="sbar-dot" id="sb3"></div>
+    <div class="sbar-dot" id="sb4"></div>
+    <span class="sbar-lbl" id="sbar-lbl">Scene 1 of 5</span>
+  </div>
+  <div class="aria-card" id="aria-card">
+    <div class="aria-top">
+      <div class="aria-avatar" id="aria-avatar">🤖</div>
+      <div>
+        <div class="aria-name">Aria — AI Assistant</div>
+        <div class="aria-status" id="aria-status"><div class="dot"></div><span id="aria-status-txt">No connections. Can only guess.</span></div>
+      </div>
+    </div>
+    <div class="aria-connections" id="aria-connections"></div>
+  </div>
+
+  <!-- SCENE 1 -->
+  <div class="scene on" id="scene-0">
+    <div class="loc-badge"><span class="loc-icon">🏪</span><span class="loc-name">Location: Mall Entrance</span></div>
+    <div class="bubble-wrap">
+      <div class="bubble bubble-q">Where can I buy Nike shoes in this mall?</div>
+      <div class="bubble bubble-a blind" id="s0-blind"><div class="guess-tag">⚠ Guessing</div><br>"Nike is a popular brand. Most large malls have sportswear stores. You might find them near the food court or on the ground floor. I'd suggest walking around to check."</div>
+      <div class="bubble bubble-a smart" id="s0-smart"><div class="live-tag">✓ Live data</div><br>"Nike Store is on <strong>Level 2, Unit 214</strong>, near the East Escalator. Open until 9pm today. They currently have a 30% sale on running shoes."</div>
+    </div>
+    <div class="connect-panel">
+      <div class="connect-title">Available to connect</div>
+      <div class="connect-plug" id="plug-0" onclick="connectPlug(0)">
+        <div class="plug-icon">🗂️</div>
+        <div class="plug-info"><div class="plug-name">Mall Directory Server</div><div class="plug-desc">Live store list · locations · opening hours · current offers</div></div>
+        <button class="plug-btn">Connect →</button><span class="plug-status">✓ Connected</span>
+      </div>
+    </div>
+    <div class="insight" id="ins-0"><span class="ih">What just happened?</span>Aria went from <strong>guessing "probably near the food court"</strong> to giving the exact unit number, floor, and a live sale offer — because she can now <strong>read from the Mall Directory Server</strong>.<br><br>That server is the first piece of what MCP is all about: a standard way for AI to connect to a real data source.</div>
+    <div class="scene-nav"><span class="scene-hint" id="sh0">Connect the server to see what changes</span><button class="btn-sm" id="sn0" style="display:none" onclick="goScene(1)">Next scene →</button></div>
+  </div>
+
+  <!-- SCENE 2 -->
+  <div class="scene" id="scene-1">
+    <div class="loc-badge"><span class="loc-icon">🎬</span><span class="loc-name">Location: Mall Cinema</span></div>
+    <div class="bubble-wrap">
+      <div class="bubble bubble-q">Are there still tickets left for the 7pm Spider-Man show tonight?</div>
+      <div class="bubble bubble-a blind" id="s1-blind"><div class="guess-tag">⚠ Guessing</div><br>"Popular Marvel films tend to sell out quickly on weekends. I'd recommend booking in advance online or arriving early to check at the counter."</div>
+      <div class="bubble bubble-a smart" id="s1-smart"><div class="live-tag">✓ Live data</div><br>"Yes! The 7pm Spider-Man show in <strong>Screen 4</strong> has <strong>23 seats left</strong> — including 6 premium seats in row D. Shall I book 2 tickets for you?"</div>
+    </div>
+    <div class="connect-panel">
+      <div class="connect-title">Available to connect</div>
+      <div class="connect-plug" id="plug-1" onclick="connectPlug(1)">
+        <div class="plug-icon">🎟️</div>
+        <div class="plug-info"><div class="plug-name">Cinema Booking Server</div><div class="plug-desc">Live seat availability · show times · screen assignments</div></div>
+        <button class="plug-btn">Connect →</button><span class="plug-status">✓ Connected</span>
+      </div>
+    </div>
+    <div class="insight" id="ins-1"><span class="ih">Notice something new?</span>Aria didn't just answer the question — she ended with <strong>"Shall I book 2 tickets for you?"</strong><br><br>When AI has a live connection, it can do more than retrieve data — it can <strong>take action</strong>. This is the power of MCP: <strong>Tools, not just answers.</strong></div>
+    <div class="scene-nav"><span class="scene-hint" id="sh1">Connect the cinema server</span><button class="btn-sm" id="sn1" style="display:none" onclick="goScene(2)">Next scene →</button></div>
+  </div>
+
+  <!-- SCENE 3 -->
+  <div class="scene" id="scene-2">
+    <div class="loc-badge"><span class="loc-icon">🍕</span><span class="loc-name">Location: Food Court</span></div>
+    <div class="bubble-wrap">
+      <div class="bubble bubble-q">I'm hungry. What's the wait time at Pizza Palace right now? And is the vegetarian pasta available today?</div>
+      <div class="bubble bubble-a blind" id="s2-blind"><div class="guess-tag">⚠ Guessing</div><br>"Food courts can get busy around lunchtime. Pizza places usually have a 10–20 minute wait. Most Italian restaurants offer vegetarian options — it's best to ask the staff directly."</div>
+      <div class="bubble bubble-a smart" id="s2-smart"><div class="live-tag">✓ Live data</div><br>"Pizza Palace currently has a <strong>7-minute wait</strong> (quiet today!). The vegetarian pasta <strong>is available</strong> and rated 4.7 ⭐ by recent visitors. They also have a lunch deal — pasta + drink for ₹349 until 3pm."</div>
+    </div>
+    <div class="connect-panel">
+      <div class="connect-title">Available to connect</div>
+      <div class="connect-plug" id="plug-2" onclick="connectPlug(2)">
+        <div class="plug-icon">🍽️</div>
+        <div class="plug-info"><div class="plug-name">Restaurant Server</div><div class="plug-desc">Live wait times · today's menu · real-time ratings · offers</div></div>
+        <button class="plug-btn">Connect →</button><span class="plug-status">✓ Connected</span>
+      </div>
+    </div>
+    <div class="insight" id="ins-2"><span class="ih">One question — three data points</span>Aria answered wait time, menu availability, and today's special deal — all from <strong>one server call</strong>.<br><br>Aria is now connected to <strong>multiple servers at the same time</strong>. One AI, many connections, working together.</div>
+    <div class="scene-nav"><span class="scene-hint" id="sh2">Connect the restaurant server</span><button class="btn-sm" id="sn2" style="display:none" onclick="goScene(3)">Next scene →</button></div>
+  </div>
+
+  <!-- SCENE 4 -->
+  <div class="scene" id="scene-3">
+    <div class="loc-badge"><span class="loc-icon">🅿️</span><span class="loc-name">Location: Mall Parking</span></div>
+    <div class="bubble-wrap">
+      <div class="bubble bubble-q">I parked on Level 3. Is it getting full? Should I move my car before the movie ends?</div>
+      <div class="bubble bubble-a blind" id="s3-blind"><div class="guess-tag">⚠ Guessing</div><br>"Parking lots at malls can fill up quickly during evenings and weekends. I recommend moving your car earlier rather than later to avoid the rush."</div>
+      <div class="bubble bubble-a smart" id="s3-smart"><div class="live-tag">✓ Live data</div><br>"Level 3 is currently at <strong>78% capacity</strong> and filling fast — 22 spots left. Your 7pm movie ends at 9:15pm. At current fill rate, Level 3 may be full by then. <strong>Level 5 has 140 free spots</strong> — I'd move there now."</div>
+    </div>
+    <div class="connect-panel">
+      <div class="connect-title">Available to connect</div>
+      <div class="connect-plug" id="plug-3" onclick="connectPlug(3)">
+        <div class="plug-icon">🚗</div>
+        <div class="plug-info"><div class="plug-name">Parking Sensor Network</div><div class="plug-desc">Real-time occupancy per level · fill rate prediction · available bays</div></div>
+        <button class="plug-btn">Connect →</button><span class="plug-status">✓ Connected</span>
+      </div>
+    </div>
+    <div class="insight" id="ins-3"><span class="ih">Now Aria is combining multiple servers</span>That answer used <strong>two servers at once</strong> — Cinema Server (movie end time) and Parking Server (fill rate).<br><br>Aria composed those two live data sources into one smart recommendation. With MCP: <strong>plug in the servers, and the AI does the rest.</strong></div>
+    <div class="scene-nav"><span class="scene-hint" id="sh3">Connect the parking server</span><button class="btn-sm" id="sn3" style="display:none" onclick="goScene(4)">Final scene →</button></div>
+  </div>
+
+  <!-- SCENE 5 -->
+  <div class="scene" id="scene-4">
+    <div class="loc-badge"><span class="loc-icon">🔌</span><span class="loc-name">Location: The Big Picture</span></div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:1.5rem;margin-bottom:1.25rem">
+      <div style="font-size:.75rem;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.9rem">Aria — fully connected</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.25rem">
+        <div style="background:var(--tdim);border:1px solid rgba(0,212,170,.22);border-radius:var(--r);padding:.9rem;text-align:center"><div style="font-size:1.5rem;margin-bottom:5px">🗂️</div><div style="font-size:.78rem;font-weight:500;color:var(--teal);margin-bottom:2px">Mall Directory</div><div style="font-size:.72rem;color:var(--text3)">stores · locations · offers</div></div>
+        <div style="background:var(--tdim);border:1px solid rgba(0,212,170,.22);border-radius:var(--r);padding:.9rem;text-align:center"><div style="font-size:1.5rem;margin-bottom:5px">🎟️</div><div style="font-size:.78rem;font-weight:500;color:var(--teal);margin-bottom:2px">Cinema Booking</div><div style="font-size:.72rem;color:var(--text3)">seats · times · actions</div></div>
+        <div style="background:var(--tdim);border:1px solid rgba(0,212,170,.22);border-radius:var(--r);padding:.9rem;text-align:center"><div style="font-size:1.5rem;margin-bottom:5px">🍽️</div><div style="font-size:.78rem;font-weight:500;color:var(--teal);margin-bottom:2px">Restaurant</div><div style="font-size:.72rem;color:var(--text3)">menu · wait times · deals</div></div>
+        <div style="background:var(--tdim);border:1px solid rgba(0,212,170,.22);border-radius:var(--r);padding:.9rem;text-align:center"><div style="font-size:1.5rem;margin-bottom:5px">🚗</div><div style="font-size:.78rem;font-weight:500;color:var(--teal);margin-bottom:2px">Parking Sensors</div><div style="font-size:.72rem;color:var(--text3)">live occupancy · predictions</div></div>
+      </div>
+      <div class="bubble-wrap">
+        <div class="bubble bubble-q">Plan my perfect evening at the mall — movie, dinner, and parking sorted.</div>
+        <div class="bubble bubble-a smart" style="display:block"><div class="live-tag">✓ All 4 servers</div><br>"Here's your evening: 🎬 <strong>Spider-Man at 7pm in Screen 4</strong> — 23 seats left, I can book now. 🍕 <strong>Pizza Palace dinner at 5:30pm</strong> — only 7 min wait, vegetarian pasta available. 🚗 <strong>Park on Level 5</strong> — 140 spots free, and you'll be out before Level 3 fills up. Want me to book the movie tickets?"</div>
+      </div>
+    </div>
+    <div class="insight show" style="margin-bottom:1.25rem"><span class="ih">So — what is MCP?</span><strong>MCP = Model Context Protocol.</strong> It is the open standard that defines exactly how an AI like Aria connects to real systems.<br><br>Think of it as <strong>USB-C for AI</strong>. Before USB-C, every device had its own cable. USB-C standardised the connector — one cable works everywhere. <strong>MCP does the same for AI ↔ data connections.</strong><br><br>Before MCP: every team built custom one-off connectors. Fragile. Months of work.<br>After MCP: build a server once. <strong>Any AI can use it. Everywhere.</strong></div>
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rl);padding:1.25rem;margin-bottom:1.25rem">
+      <div style="font-size:.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.85rem">Your hackathon project — same idea</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="font-size:.83rem;color:var(--text2);background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.85rem;line-height:1.5"><div style="font-size:.72rem;color:var(--coral);font-weight:600;margin-bottom:4px">WITHOUT MCP</div>Mall Directory → ❌<br>Cinema → ❌<br>Restaurant → ❌<br>Parking → ❌<br><br>Result: <span style="color:var(--coral)">Confident guesses</span></div>
+        <div style="font-size:.83rem;color:var(--text2);background:var(--tdim);border:1px solid rgba(0,212,170,.22);border-radius:var(--r);padding:.85rem;line-height:1.5"><div style="font-size:.72rem;color:var(--teal);font-weight:600;margin-bottom:4px">WITH MCP</div>Mall Directory → ✅<br>Cinema → ✅<br>Restaurant → ✅<br>Parking → ✅<br><br>Result: <span style="color:var(--teal)">Real answers + actions</span></div>
+      </div>
+    </div>
+    <div class="scene-nav" style="justify-content:center;gap:10px">
+      <button class="btn-g" onclick="showPage('p-slides')">View Slides →</button>
+      <button class="btn-p" onclick="showPage('p-quiz')">📝 Take the Quiz →</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ======================================================
+     SLIDES
+====================================================== -->
+<section id="p-slides" class="page">
+<div class="wrap">
+  <div class="sec-banner">
+    <div class="sec-banner-icon">📊</div>
+    <div class="sec-banner-body">
+      <div class="sec-banner-label">Webinar Slides</div>
+      <div class="sec-banner-title">Model Context Protocol — Deep Dive</div>
+      <div class="sec-banner-sub">8 slides covering everything from the core problem MCP solves to your first working server. Use ← → arrow keys to navigate.</div>
+    </div>
+  </div>
+  <div class="slide-strip">
+    <button class="stab on" onclick="goSlide(0)">1 · What is MCP?</button>
+    <button class="stab" onclick="goSlide(1)">2 · The Problem</button>
+    <button class="stab" onclick="goSlide(2)">3 · Before vs After</button>
+    <button class="stab" onclick="goSlide(3)">4 · How it works</button>
+    <button class="stab" onclick="goSlide(4)">5 · MCP Server</button>
+    <button class="stab" onclick="goSlide(5)">6 · Real world</button>
+    <button class="stab" onclick="goSlide(6)">7 · Build it</button>
+    <button class="stab" onclick="goSlide(7)">8 · Get started</button>
+  </div>
+  <!-- SLIDE 1 -->
+  <div class="slide on" id="sl-0">
+    <div class="slide-vis-header">
+      <div class="slide-vis-icon teal">🔌</div>
+      <div class="slide-vis-text">
+        <div class="sh" style="margin-bottom:.3rem">Slide 01 · Introduction</div>
+        <div class="stitle">What is <span style="color:var(--teal)">MCP</span>?</div>
+        <p class="ssub">Model Context Protocol is an open standard that lets AI models connect to real-world data sources and tools — safely, consistently, and at scale.</p>
+      </div>
+    </div>
+    <div class="tag-row"><span class="tag teal">🌐 Open Standard</span><span class="tag blue">🤖 Any AI Model</span><span class="tag amber">⚡ Nov 2024</span><span class="tag">🔓 Free to use</span></div>
+    <div class="stat-row">
+      <div class="stat-c" style="border-top:2px solid var(--teal)"><span class="stat-n">Nov '24</span><span class="stat-l">Announced by Anthropic</span></div>
+      <div class="stat-c" style="border-top:2px solid var(--blue)"><span class="stat-n" style="color:var(--blue)">Open</span><span class="stat-l">Free, no vendor lock-in</span></div>
+      <div class="stat-c" style="border-top:2px solid var(--amber)"><span class="stat-n" style="color:var(--amber)">Any AI</span><span class="stat-l">Claude, GPT, Gemini...</span></div>
+      <div class="stat-c" style="border-top:2px solid var(--purple)"><span class="stat-n" style="color:var(--purple)">Any tool</span><span class="stat-l">DB, Calendar, Files, APIs</span></div>
+    </div>
+    <div class="hl">Think of MCP as <strong>USB-C for AI</strong>. Before USB-C every device needed its own cable. USB-C standardised the connector. MCP does the same for AI ↔ data connections. Build the connector once — every AI can use it.</div>
+    <div class="snav-row"><button class="btn-smp" onclick="goSlide(1)">Next →</button></div>
+  </div>
+  <!-- SLIDE 2 -->
+  <div class="slide" id="sl-1">
+    <div class="slide-vis-header">
+      <div class="slide-vis-icon coral">⚠️</div>
+      <div class="slide-vis-text">
+        <div class="sh" style="margin-bottom:.3rem">Slide 02 · The Problem</div>
+        <div class="stitle">Why AI fails without MCP</div>
+        <p class="ssub">AI models are trained on vast knowledge — but that knowledge goes stale. Without live connections, every answer about your system is a guess.</p>
+      </div>
+    </div>
+    <div class="feat-list">
+      <div class="feat"><div class="fi">📅</div><div><div class="fh">Time-blind by default</div><div class="fb">Training data has a cutoff. Anything after that date is invisible to the model.</div></div></div>
+      <div class="feat"><div class="fi">🔒</div><div><div class="fh">No access to your private data</div><div class="fb">Your databases, internal files, customer records — the AI has never seen any of it.</div></div></div>
+      <div class="feat"><div class="fi">🔧</div><div><div class="fh">Custom integrations don't scale</div><div class="fb">Before MCP, every team built one-off API wrappers. Fragile. Expensive. Not reusable across AI tools.</div></div></div>
+      <div class="feat"><div class="fi">🎲</div><div><div class="fh">Hallucination fills the gap</div><div class="fb">When the AI can't look something up, it generates a plausible-sounding answer. Confidently wrong.</div></div></div>
+    </div>
+    <div class="snav-row"><button class="btn-sm" onclick="goSlide(0)">← Back</button><button class="btn-smp" onclick="goSlide(2)">Next →</button></div>
+  </div>
+  <!-- SLIDE 3 -->
+  <div class="slide" id="sl-2">
+    <div class="slide-vis-header">
+      <div class="slide-vis-icon amber">⚖️</div>
+      <div class="slide-vis-text">
+        <div class="sh" style="margin-bottom:.3rem">Slide 03 · Comparison</div>
+        <div class="stitle">Before vs After MCP</div>
+        <p class="ssub">The difference isn't incremental — it's architectural. Build once, run anywhere.</p>
+      </div>
+    </div>
+    <div class="ba-wrap">
+      <div class="ba"><div class="ba-lbl r">❌ Before MCP</div><div class="ba-item">Custom API wrapper built from scratch each time</div><div class="ba-item">No standard auth or permissions model</div><div class="ba-item">Works for one AI tool only — not portable</div><div class="ba-item">Breaks every time the API changes</div><div class="ba-item">Months of work for basic integrations</div></div>
+      <div class="ba-arr">→</div>
+      <div class="ba af"><div class="ba-lbl g">✅ After MCP</div><div class="ba-item">Build an MCP server once — any AI uses it</div><div class="ba-item">Standardised auth, permissions, error handling</div><div class="ba-item">Works with Claude, GPT, any MCP-compatible AI</div><div class="ba-item">Schema-defined interface — easy to maintain</div><div class="ba-item">First working server in under a day</div></div>
+    </div>
+    <div class="snav-row"><button class="btn-sm" onclick="goSlide(1)">← Back</button><button class="btn-smp" onclick="goSlide(3)">Next →</button></div>
+  </div>
+  <!-- SLIDE 4 -->
+  <div class="slide" id="sl-3">
+    <div class="slide-vis-header">
+      <div class="slide-vis-icon blue">🏗️</div>
+      <div class="slide-vis-text">
+        <div class="sh" style="margin-bottom:.3rem">Slide 04 · Architecture</div>
+        <div class="stitle">How MCP works</div>
+        <p class="ssub">Three components. One clean flow. Zero guesswork.</p>
+      </div>
+    </div>
+    <div class="feat-list">
+      <div class="feat numbered"><div class="fi" style="background:rgba(74,158,255,.15);border-color:rgba(74,158,255,.3);color:var(--blue);font-size:.78rem;font-weight:800">1</div><div><div class="fh" style="color:var(--blue)">MCP Host — the AI application</div><div class="fb">Claude Desktop, your custom chatbot, Copilot Studio. Runs the conversation, decides when to call external tools.</div></div></div>
+      <div class="feat numbered"><div class="fi" style="background:var(--tdim);border-color:rgba(0,212,170,.3);color:var(--teal);font-size:.78rem;font-weight:800">2</div><div><div class="fh" style="color:var(--teal)">MCP Client — inside the Host</div><div class="fb">Manages secure connections to each MCP Server. Sends requests, handles auth, returns structured responses.</div></div></div>
+      <div class="feat numbered"><div class="fi" style="background:rgba(245,166,35,.12);border-color:rgba(245,166,35,.3);color:var(--amber);font-size:.78rem;font-weight:800">3</div><div><div class="fh" style="color:var(--amber)">MCP Server — your data service</div><div class="fb">A small service you build that exposes your data and tools through a standard interface. One server can expose a database, calendar, file system — or a whole mall system.</div></div></div>
+    </div>
+    <div class="hl"><strong>The flow:</strong> User asks → Host decides what to look up → Client calls Server → Server fetches real data → Host replies with an accurate, live answer.</div>
+    <div class="snav-row"><button class="btn-sm" onclick="goSlide(2)">← Back</button><button class="btn-smp" onclick="goSlide(4)">Next →</button></div>
+  </div>
+  <!-- SLIDE 5 -->
+  <div class="slide" id="sl-4">
+    <div class="slide-vis-header">
+      <div class="slide-vis-icon purple">📦</div>
+      <div class="slide-vis-text">
+        <div class="sh" style="margin-bottom:.3rem">Slide 05 · Capabilities</div>
+        <div class="stitle">What an MCP Server exposes</div>
+        <p class="ssub">Three capability types — any server can offer any combination.</p>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="gcard"><div style="font-size:1.6rem;margin-bottom:.7rem">🛠️</div><div style="font-weight:700;color:var(--teal);margin-bottom:.4rem">Tools</div><div style="font-size:.82rem;color:var(--text2);line-height:1.65;margin-bottom:.7rem">Functions the AI can call — with typed inputs so the AI knows exactly how to use them.</div><div style="background:var(--bg3);border-radius:8px;padding:.5rem .75rem;font-size:.73rem;color:var(--text3);font-family:'Courier New',monospace">run_query() · book_ticket()</div></div>
+      <div class="gcard"><div style="font-size:1.6rem;margin-bottom:.7rem">📄</div><div style="font-weight:700;color:var(--amber);margin-bottom:.4rem">Resources</div><div style="font-size:.82rem;color:var(--text2);line-height:1.65;margin-bottom:.7rem">Structured data identified by URI — files, records, documents — read on demand.</div><div style="background:var(--bg3);border-radius:8px;padding:.5rem .75rem;font-size:.73rem;color:var(--text3);font-family:'Courier New',monospace">menu.json · profile/{id}</div></div>
+    </div>
+    <div class="gcard" style="margin-top:0"><div style="font-size:1.6rem;margin-bottom:.7rem">💬</div><div style="font-weight:700;color:var(--blue);margin-bottom:.4rem">Prompts</div><div style="font-size:.82rem;color:var(--text2);line-height:1.65">Reusable prompt templates — standardised workflows like "summarise this order" or "generate a release note from these commits".</div></div>
+    <div class="snav-row"><button class="btn-sm" onclick="goSlide(3)">← Back</button><button class="btn-smp" onclick="goSlide(5)">Next →</button></div>
+  </div>
+  <!-- SLIDE 6 -->
+  <div class="slide" id="sl-5">
+    <div class="slide-vis-header">
+      <div class="slide-vis-icon teal">🌍</div>
+      <div class="slide-vis-text">
+        <div class="sh" style="margin-bottom:.3rem">Slide 06 · Real World</div>
+        <div class="stitle">MCP across industries</div>
+        <p class="ssub">Every industry has siloed data. MCP is how AI reaches it.</p>
+      </div>
+    </div>
+    <div class="feat-list">
+      <div class="feat"><div class="fi" style="background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.2)">🏥</div><div><div class="fh">Healthcare — "Is Dr. Sharma free at 3pm?"</div><div class="fb"><span style="color:var(--coral)">Without MCP:</span> "Doctors are usually available in the afternoon..." &nbsp;·&nbsp; <span style="color:var(--teal)">With MCP:</span> Queries calendar + EHR server → "30-min slot at 3:15pm in Room 4, confirmed."</div></div></div>
+      <div class="feat"><div class="fi" style="background:rgba(74,158,255,.08);border-color:rgba(74,158,255,.2)">🛒</div><div><div class="fh">E-commerce — "Where is my order?"</div><div class="fb"><span style="color:var(--coral)">Without MCP:</span> "Orders typically take 3–5 days..." &nbsp;·&nbsp; <span style="color:var(--teal)">With MCP:</span> Queries logistics server → "Your parcel is at the Pune hub. Delivery tomorrow 10am–1pm."</div></div></div>
+      <div class="feat"><div class="fi" style="background:rgba(245,166,35,.08);border-color:rgba(245,166,35,.2)">🏦</div><div><div class="fh">Finance — "Should I renew my FD today?"</div><div class="fb"><span style="color:var(--coral)">Without MCP:</span> "Interest rates vary by bank and tenure..." &nbsp;·&nbsp; <span style="color:var(--teal)">With MCP:</span> Queries rates + portfolio server → "Today's rate is 7.4%. Your FD matures on the 20th — perfect timing."</div></div></div>
+    </div>
+    <div class="snav-row"><button class="btn-sm" onclick="goSlide(4)">← Back</button><button class="btn-smp" onclick="goSlide(6)">Next →</button></div>
+  </div>
+  <!-- SLIDE 7 -->
+  <div class="slide" id="sl-6">
+    <div class="slide-vis-header">
+      <div class="slide-vis-icon amber">🚀</div>
+      <div class="slide-vis-text">
+        <div class="sh" style="margin-bottom:.3rem">Slide 07 · Build</div>
+        <div class="stitle">Build it at the Hackathon</div>
+        <p class="ssub">What could you build today if your AI could connect to any system?</p>
+      </div>
+    </div>
+    <div class="tl">
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-d">💡 Idea</div><div class="tl-t">Pick a real problem with siloed data</div><div class="tl-b">A canteen AI that doesn't know today's menu. A library bot that can't check book availability. A campus assistant that guesses event schedules. Any of these becomes powerful with one MCP server.</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-d">🔨 Build</div><div class="tl-t">Write your MCP server (30 min)</div><div class="tl-b">Wrap your existing database or API with the MCP SDK. Expose 2–3 tools. Connect it to Claude or your AI. Done.</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-d">🔗 Expand</div><div class="tl-t">Add a second server, chain them</div><div class="tl-b">Like the mall story — once you have two servers, your AI can compose them. Answers get richer. Actions become possible.</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-d">🎯 Demo</div><div class="tl-t">Show the before vs. after</div><div class="tl-b">The most powerful demo: same question, AI without MCP vs. AI with MCP. The difference is instant — just like Aria in the mall.</div></div>
+    </div>
+    <div class="snav-row"><button class="btn-sm" onclick="goSlide(5)">← Back</button><button class="btn-smp" onclick="goSlide(7)">Next →</button></div>
+  </div>
+  <!-- SLIDE 8 -->
+  <div class="slide" id="sl-7">
+    <div class="slide-vis-header">
+      <div class="slide-vis-icon teal">⚡</div>
+      <div class="slide-vis-text">
+        <div class="sh" style="margin-bottom:.3rem">Slide 08 · Quick Start</div>
+        <div class="stitle">Get started in 3 steps</div>
+        <p class="ssub">Your first working MCP server in under a day — no boilerplate required.</p>
+      </div>
+    </div>
+    <div class="feat-list">
+      <div class="feat numbered"><div class="fi" style="background:var(--grad);border:none;color:#0b0c10;font-size:.78rem;font-weight:800">1</div><div><div class="fh">Install the SDK</div><div class="code"><span class="cm"># Python</span><br>pip install mcp<br><br><span class="cm"># Node.js</span><br>npm install @modelcontextprotocol/sdk</div></div></div>
+      <div class="feat numbered"><div class="fi" style="background:var(--grad);border:none;color:#0b0c10;font-size:.78rem;font-weight:800">2</div><div><div class="fh">Define your tools</div><div class="code"><span class="kw">from</span> mcp.server <span class="kw">import</span> Server<br>app = Server(<span class="str">"my-server"</span>)<br><br>@app.tool()<br><span class="kw">async def</span> check_stock(item: str):<br>&nbsp;&nbsp;<span class="str">"""Check if item is in stock"""</span><br>&nbsp;&nbsp;<span class="kw">return</span> db.query(<span class="str">"SELECT ..."</span>)</div></div></div>
+      <div class="feat numbered"><div class="fi" style="background:var(--grad);border:none;color:#0b0c10;font-size:.78rem;font-weight:800">3</div><div><div class="fh">Connect to your AI</div><div class="fb">Register the server in Claude Desktop, LangGraph, or any MCP-compatible AI. The AI automatically discovers your tools and calls them when relevant. <strong style="color:var(--teal)">First live query in ~30 minutes.</strong></div></div></div>
+    </div>
+    <div class="snav-row"><button class="btn-sm" onclick="goSlide(6)">← Back</button><button class="btn-smp" onclick="showPage('p-quiz')">📝 Take the Quiz →</button></div>
+  </div>
+</div>
+</section>
+
+<!-- ======================================================
+     ARCHITECTURE
+====================================================== -->
+<section id="p-arch" class="page">
+<div class="wrap">
+  <div class="sec-banner">
+    <div class="sec-banner-icon">🏗️</div>
+    <div class="sec-banner-body">
+      <div class="sec-banner-label">Interactive Explorer</div>
+      <div class="sec-banner-title">MCP Architecture — tap to explore</div>
+      <div class="sec-banner-sub">Click each component in the diagram to reveal its role. See how the Host, Client, and Servers collaborate in real time.</div>
+    </div>
+  </div>
+  <div class="arch-box">
+    <div class="arow"><div class="anode" onclick="showNode('user')" id="an-user"><div class="ni">👤</div><div class="nl">User</div><div class="nt">asks a question</div></div></div>
+    <div class="aconn"><div class="aconn-line"></div><div class="aconn-lbl">natural language</div><div class="aconn-line"></div></div>
+    <div class="arow"><div class="anode" onclick="showNode('host')" id="an-host" style="width:170px"><div class="ni">🖥️</div><div class="nl">MCP Host</div><div class="nt">Claude / your AI app</div></div></div>
+    <div class="aconn"><div class="aconn-line"></div><div class="aconn-lbl">MCP protocol (JSON-RPC)</div><div class="aconn-line"></div></div>
+    <div class="arow">
+      <div class="anode" onclick="showNode('db')" id="an-db"><div class="ni">🗄️</div><div class="nl">MCP Server</div><div class="nt">Database</div></div>
+      <div class="anode" onclick="showNode('cal')" id="an-cal"><div class="ni">📅</div><div class="nl">MCP Server</div><div class="nt">Calendar</div></div>
+      <div class="anode" onclick="showNode('files')" id="an-files"><div class="ni">📁</div><div class="nl">MCP Server</div><div class="nt">Files / Docs</div></div>
+      <div class="anode" onclick="showNode('api')" id="an-api"><div class="ni">🌐</div><div class="nl">MCP Server</div><div class="nt">Any API</div></div>
+    </div>
+  </div>
+  <div class="node-det" id="node-det"><div class="nd-t" id="nd-t"></div><div class="nd-b" id="nd-b"></div></div>
+  <div class="hl" style="margin-top:1.25rem"><strong>Key insight:</strong> The Host connects to all servers simultaneously. A single question can trigger calls to multiple servers — and the AI synthesises all answers into one coherent reply.</div>
+  <div style="display:flex;justify-content:flex-end;margin-top:1.25rem"><button class="btn-smp" onclick="showPage('p-wrap')">Poll and resources →</button></div>
+</div>
+</section>
+
+<!-- ======================================================
+     POLL & WRAP
+====================================================== -->
+<section id="p-wrap" class="page">
+<div class="wrap">
+  <div class="sec-banner">
+    <div class="sec-banner-icon">📊</div>
+    <div class="sec-banner-body">
+      <div class="sec-banner-label">Live Poll</div>
+      <div class="sec-banner-title">Quick check-in</div>
+      <div class="sec-banner-sub">Now that you've seen MCP in the mall — where are you most excited to connect it?</div>
+    </div>
+  </div>
+  <div class="gcard" style="margin-bottom:1.75rem">
+    <div class="poll-q">If you build an MCP server at this hackathon, what would it connect to?</div>
+    <div class="poll-opts" id="poll-opts">
+      <div class="popt" data-letter="A" onclick="vote(0)">A database my project already has</div>
+      <div class="popt" data-letter="B" onclick="vote(1)">A public API (weather, maps, news, sports...)</div>
+      <div class="popt" data-letter="C" onclick="vote(2)">Calendar or email system</div>
+      <div class="popt" data-letter="D" onclick="vote(3)">Something entirely new — I have an idea!</div>
+      <div class="popt" data-letter="E" onclick="vote(4)">Not sure yet — I need to explore the docs</div>
+    </div>
+    <div class="poll-res" id="poll-res"></div>
+  </div>
+  <hr class="div">
+  <div style="font-size:10px;font-weight:600;color:var(--teal);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Resources</div>
+  <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;margin-bottom:.9rem">Where to go next</div>
+  <div class="res-grid">
+    <a class="rc" href="https://modelcontextprotocol.io" target="_blank" style="border-top:2px solid var(--teal)"><div class="rc-i">📖</div><div class="rc-t">MCP Official Docs</div><div class="rc-u">modelcontextprotocol.io</div></a>
+    <a class="rc" href="https://github.com/modelcontextprotocol" target="_blank" style="border-top:2px solid var(--blue)"><div class="rc-i">💻</div><div class="rc-t">MCP GitHub (SDKs)</div><div class="rc-u">github.com/modelcontextprotocol</div></a>
+    <a class="rc" href="https://www.anthropic.com/news/model-context-protocol" target="_blank" style="border-top:2px solid var(--purple)"><div class="rc-i">🔬</div><div class="rc-t">Anthropic Announcement</div><div class="rc-u">anthropic.com</div></a>
+    <a class="rc" href="https://docs.anthropic.com" target="_blank" style="border-top:2px solid var(--amber)"><div class="rc-i">🛠️</div><div class="rc-t">Build your first server</div><div class="rc-u">docs.anthropic.com</div></a>
+  </div>
+  <div class="gcard" style="text-align:center;margin-top:1.5rem">
+    <div style="font-size:2rem;margin-bottom:.6rem">💬</div>
+    <div class="qa-title" style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:.4rem">Questions?</div>
+    <div class="qa-sub" style="font-size:.86rem;color:var(--text2);line-height:1.7;margin-bottom:1.25rem">Drop them in the chat or unmute.<br>Share this URL with your team — the whole session is in it.</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn-p" onclick="showPage('p-quiz')">📝 Take the Quiz</button>
+      <button class="btn-g" onclick="showPage('p-hero')">Back to top</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ======================================================
+     QUIZ SECTION
+====================================================== -->
+<section id="p-quiz" class="page on">
+<div class="quiz-wrap">
+
+  <!-- STEP 1: Registration -->
+  <div id="quiz-step-reg" class="quiz-reg">
+    <div class="quiz-icon">
+      <!-- Brain/chip SVG -->
+      <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="36" cy="36" r="35" fill="rgba(0,212,170,.08)" stroke="rgba(0,212,170,.25)" stroke-width="1.5"/>
+        <circle cx="36" cy="36" r="26" fill="rgba(0,212,170,.06)" stroke="rgba(0,212,170,.18)" stroke-width="1"/>
+        <!-- Brain outline simplified -->
+        <path d="M26 30c0-5.5 4.5-10 10-10s10 4.5 10 10c0 2-0.6 3.9-1.6 5.5C46 37.5 47 40 47 42.5c0 3.6-2.9 6.5-6.5 6.5H31.5C27.9 49 25 46.1 25 42.5c0-2.5 1-4.9 2.6-6.9C26.6 33.9 26 32 26 30z" fill="none" stroke="#00d4aa" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Circuit lines -->
+        <line x1="36" y1="20" x2="36" y2="17" stroke="#00d4aa" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="36" y1="17" x2="32" y2="17" stroke="#00d4aa" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="36" y1="17" x2="40" y2="17" stroke="#00d4aa" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="36" y1="49" x2="36" y2="55" stroke="#00d4aa" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="25" y1="36" x2="19" y2="36" stroke="#00d4aa" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="47" y1="36" x2="53" y2="36" stroke="#00d4aa" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="32" cy="17" r="2" fill="#00d4aa" opacity=".7"/>
+        <circle cx="40" cy="17" r="2" fill="#00d4aa" opacity=".7"/>
+        <circle cx="19" cy="36" r="2" fill="#00d4aa" opacity=".7"/>
+        <circle cx="53" cy="36" r="2" fill="#00d4aa" opacity=".7"/>
+        <!-- Inner dots -->
+        <circle cx="32" cy="32" r="2" fill="rgba(0,212,170,.5)"/>
+        <circle cx="40" cy="32" r="2" fill="rgba(0,212,170,.5)"/>
+        <circle cx="36" cy="38" r="2" fill="rgba(0,212,170,.5)"/>
+      </svg>
+    </div>
+    <div class="pill"><div class="pdot"></div>TEST YOUR KNOWLEDGE</div>
+    <div class="quiz-reg-title">MCP Knowledge Quiz</div>
+    <p class="quiz-reg-sub">How well do you know Model Context Protocol?</p>
+    <div class="quiz-meta-pills">
+      <span class="qpill">📝 10 Questions</span>
+      <span class="qpill">⏱ ~5 minutes</span>
+      <span class="qpill">🎯 Multiple choice</span>
+      <span class="qpill">📊 Instant analysis</span>
+    </div>
+    <div class="quiz-form card-glow">
+      <div class="form-group">
+        <label class="form-label" for="q-name">Full Name</label>
+        <input class="form-input" id="q-name" type="text" placeholder="Your full name" autocomplete="name"/>
+        <div class="form-error" id="err-name">Please enter your name</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="q-email">Email Address</label>
+        <input class="form-input" id="q-email" type="email" placeholder="you@company.com" autocomplete="email"/>
+        <div class="form-error" id="err-email">Please enter a valid email</div>
+      </div>
+      <button class="btn-p" style="width:100%;margin-top:.5rem;padding:13px" onclick="startQuiz()">Start Quiz →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Questions -->
+  <div id="quiz-step-q" style="display:none;padding-top:1rem">
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="qprog" style="width:0%"></div></div>
+    <div class="quiz-header">
+      <div class="quiz-q-badge">
+        <span class="quiz-q-num" id="q-num-label">Question 1</span>
+        <span class="quiz-cat-tag" id="q-cat-label">Basics</span>
+      </div>
+      <div class="quiz-timer" id="q-timer">0:00</div>
+    </div>
+    <div class="quiz-q-text" id="q-text"></div>
+    <div class="quiz-options" id="q-opts"></div>
+    <div class="quiz-foot">
+      <span class="quiz-q-counter" id="q-counter">1 of 10</span>
+    </div>
+  </div>
+
+  <!-- STEP 3: Results -->
+  <!-- STEP 3: Submission confirmation (no analytics — admin only) -->
+  <div id="quiz-step-results" style="display:none">
+    <div style="text-align:center;padding:2.5rem 0">
+      <!-- Animated checkmark -->
+      <div style="display:flex;justify-content:center;margin-bottom:1.5rem">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="40" cy="40" r="38" fill="rgba(34,197,94,.07)" stroke="rgba(34,197,94,.3)" stroke-width="1.5"/>
+          <circle cx="40" cy="40" r="28" fill="rgba(34,197,94,.1)" stroke="rgba(34,197,94,.4)" stroke-width="1.5"/>
+          <polyline points="26,40 36,51 55,30" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <animate attributeName="stroke-dasharray" from="0,60" to="60,0" dur=".6s" fill="freeze" begin="0.2s"/>
+          </polyline>
+        </svg>
+      </div>
+
+      <div class="pill" style="margin-bottom:1rem"><div class="pdot" style="background:var(--success)"></div>SUBMITTED SUCCESSFULLY</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.5rem,3vw,2rem);margin-bottom:.5rem" id="confirm-title">Quiz Complete!</div>
+      <div style="font-size:.95rem;color:var(--text2);margin-bottom:2rem;font-weight:300;line-height:1.7" id="confirm-sub">Thank you for participating. Your responses have been recorded.</div>
+
+      <!-- Submission summary card -->
+      <div class="gcard" style="max-width:400px;margin:0 auto 1.75rem;text-align:left">
+        <div style="font-size:.72rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem">Submission Details</div>
+        <div style="display:grid;gap:.6rem">
+          <div style="display:flex;justify-content:space-between;font-size:.86rem;padding:.5rem 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text3)">Participant</span>
+            <span style="font-weight:600;color:var(--text)" id="confirm-name">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.86rem;padding:.5rem 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text3)">Email</span>
+            <span style="color:var(--text2)" id="confirm-email">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.86rem;padding:.5rem 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--text3)">Time taken</span>
+            <span style="color:var(--text2)" id="confirm-time">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.86rem;padding:.5rem 0">
+            <span style="color:var(--text3)">Status</span>
+            <span style="color:var(--success);font-weight:600">✓ Recorded</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notice -->
+      <div style="background:rgba(74,158,255,.06);border:1px solid rgba(74,158,255,.15);border-radius:var(--r);padding:.9rem 1.1rem;max-width:400px;margin:0 auto 1.75rem;font-size:.82rem;color:var(--text2);line-height:1.6;text-align:left">
+        <span style="font-weight:600;color:var(--blue)">📊 Results & Analytics</span><br>
+        Detailed results, scores, and performance analytics are reviewed by the admin team only.
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-p" onclick="showPage('p-ice')">🛍️ Explore the Mall Story</button>
+        <button class="btn-g" onclick="retakeQuiz()">↺ Retake Quiz</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ======================================================
+     ADMIN DASHBOARD
+====================================================== -->
+<section id="p-admin" class="page">
+<div class="wrap">
+  <div class="admin-header">
+    <div class="admin-title">Admin Dashboard</div>
+    <div class="admin-badge">ADMIN ONLY</div>
+  </div>
+
+  <div id="admin-content">
+    <!-- Populated by loadAdminData() -->
+  </div>
+</div>
+</section>
+
+<footer>MCP Hackathon 2026 &nbsp;·&nbsp; Built for <span>KPIT Webinar</span> &nbsp;·&nbsp; <span id="submission-count"></span><span class="footer-admin-link" onclick="openAdminModal()" title="Admin Login">⚙</span></footer>
+
+<!-- ADMIN LOGIN MODAL -->
+<div id="admin-modal-overlay">
+  <div id="admin-modal">
+    <div class="admin-modal-title">🔐 Admin Access</div>
+    <div class="admin-modal-sub">Enter the admin password to access the dashboard.</div>
+    <input type="password" id="admin-pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')submitAdminLogin()">
+    <div class="admin-modal-error" id="admin-modal-error"></div>
+    <div class="admin-modal-btns">
+      <button id="admin-modal-cancel" onclick="closeAdminModal()">Cancel</button>
+      <button id="admin-modal-submit" onclick="submitAdminLogin()">Login</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// ENVIRONMENT CONFIG — control visibility via URL parameters
+// ═══════════════════════════════════════════════════════════
+// By default, only Quiz + Icebreaker tabs are shown.
+// Append URL params to unlock tabs for full distribution:
+//
+//   ?home=1          → show Home tab
+//   ?slides=1        → show Slides tab
+//   ?arch=1          → show Architecture tab
+//   ?wrap=1          → show Poll & Resources tab
+//   ?admin=MCPAdmin2026 → Admin dashboard (all tabs unlocked)
+//
+// Example (all tabs): mcp-webinar.html?home=1&slides=1&arch=1&wrap=1
+// ═══════════════════════════════════════════════════════════
+
+var _p = new URLSearchParams(window.location.search);
+// DEFAULT: all tabs ON. To hide tabs for marketing, change these to false
+// or use URL params to selectively enable: ?home=1&slides=1&arch=1&wrap=1
+var CONFIG = {
+  SHOW_HOME:   _p.get('home')   !== '0',
+  SHOW_SLIDES: _p.get('slides') !== '0',
+  SHOW_ARCH:   _p.get('arch')   !== '0',
+  SHOW_WRAP:   _p.get('wrap')   !== '0',
+  IS_ADMIN:    _p.get('admin')  === 'MCPAdmin2026'
+};
+// To HIDE a tab for marketing: append ?home=0&slides=0&arch=0&wrap=0
+// To show ADMIN: append ?admin=MCPAdmin2026
+if (CONFIG.IS_ADMIN) {
+  CONFIG.SHOW_HOME = CONFIG.SHOW_SLIDES = CONFIG.SHOW_ARCH = CONFIG.SHOW_WRAP = true;
+}
+
+// Apply tab visibility from CONFIG
+function applyConfig() {
+  var tabMap = {
+    'tab-home':   CONFIG.SHOW_HOME,
+    'tab-slides': CONFIG.SHOW_SLIDES,
+    'tab-arch':   CONFIG.SHOW_ARCH,
+    'tab-wrap':   CONFIG.SHOW_WRAP,
+    'tab-quiz':   true,
+    'tab-ice':    true,
+    'tab-admin':  CONFIG.IS_ADMIN
+  };
+  Object.keys(tabMap).forEach(function(cls) {
+    document.querySelectorAll('.' + cls).forEach(function(el) {
+      el.style.display = tabMap[cls] ? '' : 'none';
+    });
+  });
+  // Set default page
+  var defaultPage = CONFIG.IS_ADMIN ? 'p-admin' : 'p-quiz';
+  showPage(defaultPage);
+  updateFooterCount();
+}
+// Run after DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', applyConfig);
+} else {
+  applyConfig();
+}
+
+/* ── PAGE NAV ── */
+var PAGES = ['p-hero','p-ice','p-slides','p-arch','p-wrap','p-quiz','p-admin'];
+function showPage(id) {
+  // Block access to hidden tabs
+  var blockMap = {
+    'p-hero':   !CONFIG.SHOW_HOME,
+    'p-slides': !CONFIG.SHOW_SLIDES,
+    'p-arch':   !CONFIG.SHOW_ARCH,
+    'p-wrap':   !CONFIG.SHOW_WRAP,
+    'p-admin':  !CONFIG.IS_ADMIN
+  };
+  if (blockMap[id]) { showPage('p-quiz'); return; }
+
+  PAGES.forEach(function(p) {
+    var e = document.getElementById(p);
+    if (e) e.classList.remove('on');
+  });
+  var t = document.getElementById(id);
+  if (t) { t.classList.add('on'); window.scrollTo(0,0); }
+  document.querySelectorAll('.nlink').forEach(function(b) {
+    b.classList.toggle('on', (b.getAttribute('onclick') || '').indexOf("'"+id+"'") > -1);
+  });
+  if (id === 'p-admin') loadAdminData();
+}
+
+/* ── MALL SCENES ── */
+var connectedPlugs = [];
+function goScene(n) {
+  for (var i=0;i<5;i++) {
+    var s=document.getElementById('scene-'+i); if(s) s.classList.remove('on');
+    var d=document.getElementById('sb'+i); if(d){d.classList.remove('now','done');if(i<n)d.classList.add('done');if(i===n)d.classList.add('now');}
+  }
+  var ts=document.getElementById('scene-'+n); if(ts) ts.classList.add('on');
+  var lbl=document.getElementById('sbar-lbl'); if(lbl) lbl.textContent='Scene '+(n+1)+' of 5';
+  window.scrollTo(0,60);
+}
+var plugData=[{name:'🗂️ Mall Directory',chip:'🗂️ Mall Directory'},{name:'🎟️ Cinema Booking',chip:'🎟️ Cinema Booking'},{name:'🍽️ Restaurant',chip:'🍽️ Restaurant'},{name:'🚗 Parking Sensors',chip:'🚗 Parking'}];
+function connectPlug(idx) {
+  var plug=document.getElementById('plug-'+idx); if(!plug||plug.classList.contains('plugged')) return;
+  plug.classList.add('plugged');
+  var blind=document.getElementById('s'+idx+'-blind'); var smart=document.getElementById('s'+idx+'-smart');
+  if(blind) blind.style.display='none'; if(smart) smart.style.display='block';
+  connectedPlugs.push(plugData[idx].chip);
+  var chips=document.getElementById('aria-connections');
+  if(chips){var c=document.createElement('div');c.className='conn-chip';c.textContent=plugData[idx].chip;chips.appendChild(c);}
+  var avatar=document.getElementById('aria-avatar'); var statusEl=document.getElementById('aria-status'); var statusTxt=document.getElementById('aria-status-txt');
+  if(avatar) avatar.classList.add('powered');
+  if(statusEl) statusEl.className='aria-status connected';
+  if(statusTxt) statusTxt.textContent=connectedPlugs.length+' server'+(connectedPlugs.length>1?'s':'')+' connected — giving live answers';
+  var ins=document.getElementById('ins-'+idx); if(ins) ins.classList.add('show');
+  var nx=document.getElementById('sn'+idx); var sh=document.getElementById('sh'+idx);
+  if(nx) nx.style.display='inline-block'; if(sh) sh.textContent='';
+}
+
+/* ── SLIDES ── */
+var SLIDE_COUNT=8;
+function goSlide(n) {
+  for(var i=0;i<SLIDE_COUNT;i++){var s=document.getElementById('sl-'+i);if(s)s.classList.remove('on');}
+  document.querySelectorAll('.stab').forEach(function(b,i){b.classList.toggle('on',i===n);});
+  var ts=document.getElementById('sl-'+n); if(ts) ts.classList.add('on');
+  window.scrollTo(0,52);
+}
+document.addEventListener('keydown',function(e){
+  var ap=document.querySelector('.page.on'); if(!ap||ap.id!=='p-slides') return;
+  var cur=-1;
+  for(var i=0;i<SLIDE_COUNT;i++){var s=document.getElementById('sl-'+i);if(s&&s.classList.contains('on')){cur=i;break;}}
+  if(cur===-1) return;
+  if(e.key==='ArrowRight'&&cur<SLIDE_COUNT-1) goSlide(cur+1);
+  if(e.key==='ArrowLeft'&&cur>0) goSlide(cur-1);
+});
+
+/* ── ARCHITECTURE ── */
+var nodeInfo={
+  'user': {t:'👤 User',b:'Asks a question in plain language. No need to know what databases exist, what APIs to call, or what servers are connected. The AI handles all of that.'},
+  'host': {t:'🖥️ MCP Host — your AI application',b:'The AI app (Claude, Copilot, your chatbot) that runs the conversation. It decides which tools to call and manages the MCP Client inside it. Think of it as Aria\'s brain in the mall story.'},
+  'db':   {t:'🗄️ MCP Server — Database',b:'A lightweight service wrapping your PostgreSQL, MySQL, Databricks, or any data store. Exposes tool functions like <strong>query_products()</strong>. The AI calls these exactly like function calls.'},
+  'cal':  {t:'📅 MCP Server — Calendar',b:'Wraps any scheduling system. Exposes tools like <strong>check_availability()</strong> or <strong>create_event()</strong>. Aria used this to know what time the movie ends when calculating parking.'},
+  'files':{t:'📁 MCP Server — Files / Docs',b:'Exposes a file system, SharePoint, or Google Drive as readable resources. Documents are accessed by URI — the AI fetches exactly what it needs, nothing more.'},
+  'api':  {t:'🌐 MCP Server — Any API',b:'Wrap any REST or GraphQL API as an MCP Server. Weather, logistics, payments, sports scores — anything with an API becomes a first-class AI tool.'}
+};
+function showNode(key) {
+  document.querySelectorAll('.anode').forEach(function(n){n.classList.remove('on');});
+  var el=document.getElementById('an-'+key); if(el) el.classList.add('on');
+  var info=nodeInfo[key]; if(!info) return;
+  var det=document.getElementById('node-det'); if(det) det.style.display='block';
+  var dt=document.getElementById('nd-t'); if(dt) dt.textContent=info.t;
+  var db=document.getElementById('nd-b'); if(db) db.innerHTML=info.b;
+}
+
+/* ── POLL ── */
+var pvotes=[12,9,7,15,6],pLabels=['Project database','Public API','Calendar / email','New idea!','Explore docs'],pVoted=false;
+function vote(idx) {
+  if(pVoted) return; pVoted=true; pvotes[idx]++;
+  var total=pvotes.reduce(function(a,b){return a+b;},0);
+  var maxV=Math.max.apply(null,pvotes);
+  var html='';
+  pvotes.forEach(function(v,i){
+    var pct=Math.round(v/total*100);
+    html+='<div class="pb-row"><div class="pb-lbl"><span>'+pLabels[i]+(i===idx?' ✓':'')+'</span><span>'+pct+'% ('+v+')</span></div><div class="pb-track"><div class="pb-fill'+(v===maxV?' top':'')+'" style="width:0" data-w="'+pct+'"></div></div></div>';
+  });
+  var res=document.getElementById('poll-res');
+  res.innerHTML=html; res.classList.add('show');
+  document.getElementById('poll-opts').style.display='none';
+  setTimeout(function(){res.querySelectorAll('.pb-fill').forEach(function(el){el.style.width=el.getAttribute('data-w')+'%';});},60);
+}
+
+/* ══════════════════════════════════════════════════════
+   QUIZ ENGINE
+══════════════════════════════════════════════════════ */
+var QUIZ_QUESTIONS = [
+  {q:"What does MCP stand for?",opts:["Machine Control Protocol","Model Context Protocol","Multi-Cloud Platform","Managed Computing Process"],ans:1,cat:"Basics",exp:"MCP stands for Model Context Protocol — an open standard for connecting AI models to real-world data sources and tools."},
+  {q:"Which company introduced MCP and when?",opts:["OpenAI, March 2023","Google DeepMind, June 2024","Anthropic, November 2024","Microsoft, January 2025"],ans:2,cat:"Basics",exp:"Anthropic announced MCP in November 2024. It is open and not proprietary — any AI can implement it."},
+  {q:"MCP is often compared to which everyday technology standard?",opts:["Bluetooth","USB-C","WiFi 6","HDMI"],ans:1,cat:"Basics",exp:"MCP is the 'USB-C for AI'. Just as USB-C standardised physical connectors, MCP standardises how AI connects to data sources and tools."},
+  {q:"Which correctly lists the three architectural components of MCP?",opts:["Model, Context, Protocol","Host, Client, Server","Input, Process, Output","Tool, Resource, Prompt"],ans:1,cat:"Architecture",exp:"MCP has three components: Host (AI application), Client (manages connections inside the Host), and Server (your data/tool service)."},
+  {q:"What is the primary role of the MCP Host?",opts:["Store data and respond to queries","Run the AI conversation and decide when to call external tools","Provide authentication tokens to MCP Servers","Translate natural language to SQL"],ans:1,cat:"Architecture",exp:"The MCP Host is the AI application (like Claude Desktop or your chatbot) that runs the conversation and decides which tools to invoke."},
+  {q:"What communication protocol does MCP use under the hood?",opts:["REST/HTTP","GraphQL","JSON-RPC","gRPC"],ans:2,cat:"Architecture",exp:"MCP uses JSON-RPC for communication between the Host/Client and Servers — a lightweight remote procedure call protocol encoded in JSON."},
+  {q:"Which three capability types can an MCP Server expose?",opts:["Queries, Actions, Templates","Tools, Resources, Prompts","APIs, Databases, Files","Input, Output, State"],ans:1,cat:"Capabilities",exp:"MCP Servers expose: Tools (callable functions with typed inputs), Resources (data by URI), and Prompts (reusable prompt templates)."},
+  {q:"In MCP, what is a 'Resource'?",opts:["A function the AI can call to take an action","A reusable prompt template for workflows","Structured data identified by URI that the AI reads on demand","A configuration file for the MCP Server"],ans:2,cat:"Capabilities",exp:"Resources are structured data identified by URI — like menu.json, inventory.csv, or profile/{id}. The AI fetches exactly what it needs."},
+  {q:"What is the main problem MCP solves for AI applications?",opts:["Making AI responses faster and cheaper","AI's inability to access real-time data and private systems","Reducing the size of AI models","Enabling AI to understand multiple languages"],ans:1,cat:"Problem Solving",exp:"MCP solves the core problem: AI models are time-blind (training cutoff) and cannot access private data. MCP provides live connections to real systems."},
+  {q:"In the Mall Adventure, what did Aria achieve with multiple MCP Servers connected?",opts:["Each server answered separately and the user combined info","Only the most recently connected server was used","She composed data from multiple servers into one coherent answer","The system slowed down due to multiple connections"],ans:2,cat:"Problem Solving",exp:"With multiple servers, Aria composed a complete evening plan by combining Cinema, Parking, Restaurant and Directory data — one AI, many live connections."}
+];
+
+var quizState = {};
+
+function startQuiz() {
+  var name = document.getElementById('q-name').value.trim();
+  var email = document.getElementById('q-email').value.trim();
+  var valid = true;
+  if (!name) { document.getElementById('err-name').style.display='block'; valid=false; } else { document.getElementById('err-name').style.display='none'; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { document.getElementById('err-email').style.display='block'; valid=false; } else { document.getElementById('err-email').style.display='none'; }
+  if (!valid) return;
+  quizState = { name:name, email:email, current:0, answers:[], startTime:Date.now(), timerInterval:null };
+  document.getElementById('quiz-step-reg').style.display='none';
+  document.getElementById('quiz-step-q').style.display='block';
+  startTimer();
+  renderQuestion(0);
+}
+
+function startTimer() {
+  quizState.timerInterval = setInterval(function() {
+    var elapsed = Math.floor((Date.now() - quizState.startTime) / 1000);
+    var m = Math.floor(elapsed/60), s = elapsed%60;
+    var el = document.getElementById('q-timer');
+    if (el) el.textContent = m+':'+(s<10?'0':'')+s;
+  }, 1000);
+}
+
+function renderQuestion(idx) {
+  var q = QUIZ_QUESTIONS[idx];
+  var pct = (idx / QUIZ_QUESTIONS.length) * 100;
+  document.getElementById('qprog').style.width = pct+'%';
+  document.getElementById('q-num-label').textContent = 'Question '+(idx+1);
+  document.getElementById('q-cat-label').textContent = q.cat;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('q-counter').textContent = (idx+1)+' of '+QUIZ_QUESTIONS.length;
+  var optsHtml = '';
+  q.opts.forEach(function(opt, i) {
+    optsHtml += '<button class="qopt" id="qopt-'+i+'" data-letter="'+String.fromCharCode(65+i)+'" onclick="selectAnswer('+i+')">' + opt + '</button>';
+  });
+  document.getElementById('q-opts').innerHTML = optsHtml;
+}
+
+function selectAnswer(selectedIdx) {
+  var opts = document.querySelectorAll('.qopt');
+  opts.forEach(function(o) { o.classList.add('locked'); });
+  var q = QUIZ_QUESTIONS[quizState.current];
+  quizState.answers.push(selectedIdx);
+  opts[selectedIdx].classList.add('selected');
+  setTimeout(function() {
+    if (selectedIdx === q.ans) {
+      opts[selectedIdx].classList.remove('selected');
+      opts[selectedIdx].classList.add('correct');
+    } else {
+      opts[selectedIdx].classList.remove('selected');
+      opts[selectedIdx].classList.add('wrong');
+      opts[q.ans].classList.add('reveal-correct');
+    }
+    setTimeout(function() {
+      quizState.current++;
+      if (quizState.current < QUIZ_QUESTIONS.length) {
+        renderQuestion(quizState.current);
+      } else {
+        finishQuiz();
+      }
+    }, 900);
+  }, 400);
+}
+
+function finishQuiz() {
+  clearInterval(quizState.timerInterval);
+  var timeSecs = Math.floor((Date.now() - quizState.startTime) / 1000);
+  var score = 0;
+  quizState.answers.forEach(function(a, i) { if (a === QUIZ_QUESTIONS[i].ans) score++; });
+  quizState.score = score;
+  quizState.timeSecs = timeSecs;
+
+  // Save to localStorage — full data for admin only
+  saveResult({
+    name: quizState.name,
+    email: quizState.email,
+    timestamp: new Date().toISOString(),
+    score: score,
+    timeSecs: timeSecs,
+    answers: quizState.answers.slice()
+  });
+
+  document.getElementById('quiz-step-q').style.display = 'none';
+  document.getElementById('quiz-step-results').style.display = 'block';
+  showConfirmation(timeSecs);
+  updateFooterCount();
+  window.scrollTo(0, 0);
+}
+
+// Simple submission confirmation — no scores, no analytics exposed to users
+function showConfirmation(timeSecs) {
+  var m = Math.floor(timeSecs / 60), s = timeSecs % 60;
+  var el = function(id) { return document.getElementById(id); };
+  if (el('confirm-name'))  el('confirm-name').textContent  = quizState.name;
+  if (el('confirm-email')) el('confirm-email').textContent = quizState.email;
+  if (el('confirm-time'))  el('confirm-time').textContent  = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function retakeQuiz() {
+  quizState = {};
+  document.getElementById('quiz-step-results').style.display='none';
+  document.getElementById('quiz-step-reg').style.display='block';
+  document.getElementById('q-name').value='';
+  document.getElementById('q-email').value='';
+  window.scrollTo(0,0);
+}
+
+/* ── LOCAL STORAGE ── */
+var STORAGE_KEY = 'mcp_quiz_results';
+
+function saveResult(result) {
+  var existing = loadResults();
+  existing.push(result);
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(existing)); } catch(e) {}
+}
+
+function loadResults() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; }
+}
+
+function updateFooterCount() {
+  var results = loadResults();
+  var el = document.getElementById('submission-count');
+  if (el && results.length > 0) el.textContent = results.length + ' quiz submission' + (results.length!==1?'s':'');
+}
+
+/* ══════════════════════════════════════════════════════
+   ADMIN DASHBOARD
+══════════════════════════════════════════════════════ */
+function loadAdminData() {
+  var results = loadResults();
+  var container = document.getElementById('admin-content');
+  if (!results.length) {
+    container.innerHTML = '<div class="admin-empty"><span class="admin-empty-icon">📭</span><div style="font-size:.95rem;font-weight:500;margin-bottom:.4rem">No submissions yet</div><div style="font-size:.82rem">Quiz results will appear here once participants complete the quiz.</div></div>';
+    return;
+  }
+  var total = results.length;
+  var avgScore = (results.reduce(function(s,r){return s+r.score;},0)/total).toFixed(1);
+  var passCount = results.filter(function(r){return r.score>=7;}).length;
+  var passRate = Math.round(passCount/total*100);
+  var bestScore = Math.max.apply(null, results.map(function(r){return r.score;}));
+
+  // Summary stats
+  var html = '<div class="admin-stats">';
+  html += '<div class="admin-stat"><span class="admin-stat-n">'+total+'</span><div class="admin-stat-l">Total Submissions</div></div>';
+  html += '<div class="admin-stat"><span class="admin-stat-n">'+avgScore+'</span><div class="admin-stat-l">Average Score / 10</div></div>';
+  html += '<div class="admin-stat"><span class="admin-stat-n amber">'+passRate+'%</span><div class="admin-stat-l">Pass Rate (≥7/10)</div></div>';
+  html += '<div class="admin-stat"><span class="admin-stat-n">'+bestScore+'/10</span><div class="admin-stat-l">Best Score</div></div>';
+  html += '</div>';
+
+  // Score distribution
+  var buckets = [0,0,0,0];
+  results.forEach(function(r){
+    if(r.score<=3) buckets[0]++;
+    else if(r.score<=6) buckets[1]++;
+    else if(r.score<=8) buckets[2]++;
+    else buckets[3]++;
+  });
+  var bucketLabels=['0–3 (Needs Work)','4–6 (Getting There)','7–8 (Good)','9–10 (Excellent)'];
+  var bucketColors=['var(--coral)','var(--amber)','rgba(0,212,170,.5)','var(--teal)'];
+  var maxBucket = Math.max.apply(null,buckets)||1;
+  html += '<div class="admin-section"><div class="admin-section-title">Score Distribution</div>';
+  buckets.forEach(function(count,i){
+    var w = Math.round(count/maxBucket*100);
+    html += '<div class="dist-row"><div class="dist-label">'+bucketLabels[i].split(' ')[0]+'</div><div class="dist-track"><div class="dist-fill" style="width:0%;background:'+bucketColors[i]+';" data-w="'+w+'">'+bucketLabels[i]+'</div></div><div class="dist-count">'+count+'</div></div>';
+  });
+  html += '</div>';
+
+  // Question performance
+  var qCorrect = new Array(10).fill(0);
+  results.forEach(function(r){
+    if(r.answers) r.answers.forEach(function(a,i){ if(a===QUIZ_QUESTIONS[i].ans) qCorrect[i]++; });
+  });
+  html += '<div class="admin-section"><div class="admin-section-title">Question Performance</div>';
+  qCorrect.forEach(function(c,i){
+    var pct = total>0?Math.round(c/total*100):0;
+    var color = pct>=70?'var(--teal)':pct>=50?'var(--amber)':'var(--coral)';
+    var flag = pct<50?' <span class="qperf-flag">⚠ Needs attention</span>':'';
+    html += '<div class="qperf-row"><div class="qperf-num">Q'+(i+1)+'</div><div class="qperf-track"><div style="width:0%;height:100%;border-radius:4px;background:'+color+';transition:width .8s ease" data-w="'+pct+'"></div></div><div class="qperf-pct">'+pct+'%</div>'+flag+'</div>';
+  });
+  html += '</div>';
+
+  // Category performance
+  var catStats = {'Basics':{c:0,t:0},'Architecture':{c:0,t:0},'Capabilities':{c:0,t:0},'Problem Solving':{c:0,t:0}};
+  results.forEach(function(r){ if(r.answers) r.answers.forEach(function(a,i){ var cat=QUIZ_QUESTIONS[i].cat; if(catStats[cat]){catStats[cat].t++;if(a===QUIZ_QUESTIONS[i].ans)catStats[cat].c++;} }); });
+  html += '<div class="admin-section"><div class="admin-section-title">Category Performance</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:9px">';
+  Object.keys(catStats).forEach(function(name){
+    var cs=catStats[name]; var p=cs.t?Math.round(cs.c/cs.t*100):0;
+    var cc=p>=70?'var(--teal)':p>=50?'var(--amber)':'var(--coral)';
+    html+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.85rem;text-align:center"><div style="font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem">'+name+'</div><div style="font-family:Syne,sans-serif;font-size:1.4rem;font-weight:700;color:'+cc+'">'+p+'%</div><div style="font-size:.72rem;color:var(--text3)">correct</div></div>';
+  });
+  html += '</div></div>';
+
+  // Actions
+  html += '<div class="admin-section"><div class="admin-section-title">Participants ('+total+')</div>';
+  html += '<div class="admin-actions"><button class="btn-sm" onclick="loadAdminData()">↺ Refresh</button><button class="btn-sm" onclick="exportCSV()">⬇ Export CSV</button><button class="btn-danger" onclick="clearAllData()">🗑 Clear All Data</button></div>';
+
+  // Table
+  html += '<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>#</th><th>Name</th><th>Email</th><th>Score</th><th>Time</th><th>Date</th><th>Answers</th></tr></thead><tbody>';
+  results.slice().reverse().forEach(function(r,i){
+    var idx = total - i;
+    var m=Math.floor(r.timeSecs/60),s=r.timeSecs%60;
+    var dateStr = r.timestamp ? new Date(r.timestamp).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+    var scoreClass = r.score>=7?'pass':'fail';
+    html += '<tr>';
+    html += '<td style="color:var(--text3)">'+idx+'</td>';
+    html += '<td style="font-weight:500;color:var(--text)">'+escHtml(r.name)+'</td>';
+    html += '<td>'+escHtml(r.email)+'</td>';
+    html += '<td><span class="score-chip '+scoreClass+'">'+r.score+'/10</span></td>';
+    html += '<td>'+m+':'+(s<10?'0':'')+s+'</td>';
+    html += '<td style="white-space:nowrap">'+dateStr+'</td>';
+    html += '<td><button class="expand-btn" onclick="toggleAnswers(this,'+JSON.stringify(r.answers||[])+')">Report ▾</button></td>';
+    html += '</tr>';
+    // Full per-user report row (hidden, admin-only)
+    html += '<tr class="report-row" id="report-'+idx+'" style="display:none"><td colspan="7" style="padding:0">';
+    html += '<div style="background:var(--bg3);border-top:1px solid var(--border);padding:1.1rem 1.25rem">';
+    html += '<div style="font-size:.72rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.9rem">📋 Full Report — '+escHtml(r.name)+'</div>';
+    // Category breakdown
+    var catStats2={'Basics':{c:0,t:3,qs:[0,1,2]},'Architecture':{c:0,t:3,qs:[3,4,5]},'Capabilities':{c:0,t:2,qs:[6,7]},'Problem Solving':{c:0,t:2,qs:[8,9]}};
+    (r.answers||[]).forEach(function(a,qi){var cat=QUIZ_QUESTIONS[qi].cat;if(catStats2[cat]&&a===QUIZ_QUESTIONS[qi].ans)catStats2[cat].c++;});
+    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:1rem">';
+    Object.keys(catStats2).forEach(function(cn){var cs=catStats2[cn];var p=Math.round(cs.c/cs.t*100);var cc=p>=70?'var(--teal)':p>=50?'var(--amber)':'var(--coral)';html+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.6rem;text-align:center"><div style="font-size:.65rem;color:var(--text3);margin-bottom:3px">'+cn+'</div><div style="font-size:1rem;font-weight:700;color:'+cc+'">'+cs.c+'/'+cs.t+'</div></div>';});
+    html += '</div>';
+    // Per-question detail
+    QUIZ_QUESTIONS.forEach(function(q,qi){
+      var userAns=(r.answers||[])[qi];
+      var ok=(userAns===q.ans);
+      html+='<div style="border-radius:8px;border:1px solid '+(ok?'rgba(34,197,94,.2)':'rgba(239,68,68,.2)')+';background:'+(ok?'rgba(34,197,94,.04)':'rgba(239,68,68,.04)')+';padding:.65rem .9rem;margin-bottom:5px;font-size:.8rem">';
+      html+='<div style="display:flex;align-items:flex-start;gap:8px"><span style="color:'+(ok?'var(--success)':'var(--danger)')+';font-weight:700;flex-shrink:0">'+(ok?'✓':'✗')+'</span><div style="flex:1"><div style="color:var(--text);font-weight:500;margin-bottom:3px">Q'+(qi+1)+'. '+q.q+'</div>';
+      html+='<div style="color:'+(ok?'var(--success)':'var(--danger)')+'">→ '+q.opts[userAns]+'</div>';
+      if(!ok) html+='<div style="color:var(--teal);margin-top:2px">✓ Correct: '+q.opts[q.ans]+'</div>';
+      html+='</div></div></div>';
+    });
+    html += '</div></td></tr>';
+  });
+  html += '</tbody></table></div></div>';
+
+  container.innerHTML = html;
+
+  // Animate bars
+  setTimeout(function(){
+    container.querySelectorAll('.dist-fill[data-w]').forEach(function(el){el.style.width=el.getAttribute('data-w')+'%';});
+    container.querySelectorAll('[data-w]').forEach(function(el){el.style.width=el.getAttribute('data-w')+'%';});
+  }, 100);
+}
+
+function toggleAnswers(btn, answers) {
+  // Find the report row — it's the next <tr> sibling of the button's <tr>
+  var row = btn.closest('tr');
+  var reportRow = row && row.nextElementSibling;
+  if (!reportRow) return;
+  var isHidden = reportRow.style.display === 'none';
+  reportRow.style.display = isHidden ? 'table-row' : 'none';
+  btn.textContent = isHidden ? 'Hide ▴' : 'Report ▾';
+}
+
+function exportCSV() {
+  var results = loadResults();
+  if (!results.length) { alert('No data to export.'); return; }
+  var rows = [['#','Name','Email','Score','Time (sec)','Timestamp'].concat(QUIZ_QUESTIONS.map(function(q,i){return 'Q'+(i+1);}))];
+  results.forEach(function(r,i){
+    var row = [(i+1), r.name, r.email, r.score, r.timeSecs, r.timestamp];
+    (r.answers||[]).forEach(function(a,qi){ row.push(a===QUIZ_QUESTIONS[qi].ans?'Correct':'Wrong'); });
+    rows.push(row);
+  });
+  var csv = rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var blob = new Blob([csv],{type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href=url; a.download='mcp-quiz-results.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function clearAllData() {
+  if (confirm('Delete ALL quiz submissions? This cannot be undone.')) {
+    localStorage.removeItem(STORAGE_KEY);
+    loadAdminData();
+    updateFooterCount();
+  }
+}
+
+function escHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── ADMIN LOGIN MODAL ── */
+function openAdminModal() {
+  document.getElementById('admin-modal-overlay').classList.add('open');
+  document.getElementById('admin-pw-input').value = '';
+  document.getElementById('admin-modal-error').textContent = '';
+  setTimeout(function(){ document.getElementById('admin-pw-input').focus(); }, 80);
+}
+function closeAdminModal() {
+  document.getElementById('admin-modal-overlay').classList.remove('open');
+}
+function submitAdminLogin() {
+  var pw = document.getElementById('admin-pw-input').value;
+  if (pw === 'MCPAdmin2026') {
+    CONFIG.IS_ADMIN = true;
+    CONFIG.SHOW_HOME = CONFIG.SHOW_SLIDES = CONFIG.SHOW_ARCH = CONFIG.SHOW_WRAP = true;
+    applyConfig();
+    closeAdminModal();
+  } else {
+    document.getElementById('admin-modal-error').textContent = 'Incorrect password. Try again.';
+    document.getElementById('admin-pw-input').value = '';
+    document.getElementById('admin-pw-input').focus();
+  }
+}
+// Close modal on overlay click
+document.getElementById('admin-modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeAdminModal();
+});
+</script>
+</body>
+</html>
